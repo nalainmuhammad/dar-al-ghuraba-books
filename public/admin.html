@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin Dashboard — Dar-ul-Ilm Books</title>
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- ─── Login Screen ─────────────────────────────────────── -->
+  <div class="admin-login" id="login-screen">
+    <div class="login-particles" id="login-particles"></div>
+    <div class="login-card glass-card-static">
+      <div class="login-logo">
+        <img src="assets/images/logo.png" alt="Dar-ul-Ilm Books" width="56" height="56">
+        <h1>Dar-ul-Ilm <span class="gradient-text">Admin</span></h1>
+        <p class="arabic-accent" style="color: var(--accent-gold);">لوحة التحكم</p>
+      </div>
+
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label for="login-email">Email Address</label>
+          <input type="email" id="login-email" placeholder="admin@darulilmbooks.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <div class="password-field">
+            <input type="password" id="login-password" placeholder="Enter your password" required autocomplete="current-password">
+            <button type="button" class="password-toggle" id="password-toggle" aria-label="Toggle password visibility">👁️</button>
+          </div>
+        </div>
+        <div id="login-error" class="login-error" style="display:none;"></div>
+        <button type="submit" class="btn btn-gold btn-lg" style="width:100%;" id="login-btn">
+          <span id="login-btn-text">Sign In</span>
+          <span id="login-spinner" class="btn-spinner" style="display:none;"></span>
+        </button>
+      </form>
+
+      <a href="index.html" class="login-back-link">← Back to Store</a>
+    </div>
+  </div>
+
+  <!-- ─── Admin Dashboard ──────────────────────────────────── -->
+  <div class="admin-dashboard" id="dashboard-screen" style="display:none;">
+
+    <!-- ─── Sidebar ──────────────────────────────────────────── -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <div class="sidebar-brand">
+        <img src="assets/images/logo.png" alt="Dar-ul-Ilm" width="36" height="36">
+        <div>
+          <span class="sidebar-brand-name">Dar-ul-Ilm</span>
+          <span class="sidebar-brand-sub">Admin Panel</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="sidebar-link active" data-section="overview" id="nav-overview">
+          <span class="sidebar-icon">📊</span> Dashboard
+        </button>
+        <button class="sidebar-link" data-section="books" id="nav-books">
+          <span class="sidebar-icon">📚</span> Manage Books
+        </button>
+        <button class="sidebar-link" data-section="categories" id="nav-categories">
+          <span class="sidebar-icon">📁</span> Categories
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="admin-profile" id="admin-profile">
+          <span class="admin-avatar">👤</span>
+          <span class="admin-name" id="admin-name">Admin</span>
+        </div>
+        <button class="sidebar-link logout-btn" id="logout-btn">
+          <span class="sidebar-icon">🚪</span> Logout
+        </button>
+        <a href="index.html" class="sidebar-link" style="text-decoration:none;">
+          <span class="sidebar-icon">🏠</span> View Store
+        </a>
+      </div>
+    </aside>
+
+    <!-- ─── Mobile Header ────────────────────────────────────── -->
+    <header class="admin-mobile-header" id="admin-mobile-header">
+      <button class="admin-menu-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <span class="admin-mobile-title">Admin Panel</span>
+      <button class="btn btn-sm" id="mobile-logout-btn" style="font-size: 0.8rem;">Logout</button>
+    </header>
+
+    <!-- ─── Main Content ─────────────────────────────────────── -->
+    <main class="admin-main" id="admin-main">
+
+      <!-- ─── Overview Section ───────────────────────────────── -->
+      <section class="admin-section active" id="section-overview">
+        <div class="admin-section-header">
+          <h2>Dashboard Overview</h2>
+          <p>Welcome back. Here's a snapshot of your bookstore.</p>
+        </div>
+
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card glass-card-static">
+            <span class="stat-icon">📚</span>
+            <div class="stat-info">
+              <h3 id="stat-total">—</h3>
+              <p>Total Books</p>
+            </div>
+          </div>
+          <div class="stat-card glass-card-static">
+            <span class="stat-icon">⭐</span>
+            <div class="stat-info">
+              <h3 id="stat-featured">—</h3>
+              <p>Featured</p>
+            </div>
+          </div>
+          <div class="stat-card glass-card-static">
+            <span class="stat-icon">✅</span>
+            <div class="stat-info">
+              <h3 id="stat-instock">—</h3>
+              <p>In Stock</p>
+            </div>
+          </div>
+          <div class="stat-card glass-card-static">
+            <span class="stat-icon">❌</span>
+            <div class="stat-info">
+              <h3 id="stat-outofstock">—</h3>
+              <p>Out of Stock</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-grid-2">
+          <div class="glass-card-static admin-card">
+            <h3>Categories Breakdown</h3>
+            <div id="categories-breakdown" class="breakdown-list"></div>
+          </div>
+          <div class="glass-card-static admin-card">
+            <h3>Pricing Overview</h3>
+            <div id="pricing-overview" class="pricing-stats"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Manage Books Section ───────────────────────────── -->
+      <section class="admin-section" id="section-books" style="display:none;">
+        <div class="admin-section-header">
+          <h2>Manage Books</h2>
+          <div class="section-actions">
+            <input type="text" class="admin-search" id="admin-search" placeholder="Search books..." aria-label="Search books">
+            <select class="admin-filter" id="admin-category-filter" aria-label="Filter by category">
+              <option value="">All Categories</option>
+            </select>
+            <button class="btn btn-gold btn-sm" id="btn-add-new">➕ Add New</button>
+          </div>
+        </div>
+
+        <div class="books-table-wrapper">
+          <table class="books-table" id="books-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Category</th>
+                <th>Price (Rs.)</th>
+                <th>Featured</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="books-tbody"></tbody>
+          </table>
+        </div>
+        <div class="admin-pagination" id="admin-pagination"></div>
+      </section>
+
+      <!-- ─── Manage Categories Section ──────────────────────── -->
+      <section class="admin-section" id="section-categories" style="display:none;">
+        <div class="admin-section-header">
+          <h2>Manage Categories</h2>
+          <div class="section-actions">
+            <button class="btn btn-gold btn-sm" id="btn-add-category">➕ Add Category</button>
+          </div>
+        </div>
+
+        <div class="books-table-wrapper">
+          <table class="books-table" id="categories-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th style="width: 150px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="categories-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ─── Add/Edit Book Modal ──────────────────────────────── -->
+  <div class="modal-overlay" id="book-modal" style="display:none; align-items: flex-start; overflow-y: auto; padding: 40px 20px;">
+    <div class="modal glass-card-static" style="max-width: 800px; width: 100%; text-align: left; margin: auto;">
+      <div class="admin-section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h2 id="form-title" style="margin: 0;">Add New Book</h2>
+        <button class="btn btn-outline btn-sm" id="btn-close-book-modal" style="padding: 4px 12px;">✕ Close</button>
+      </div>
+
+      <form id="book-form" class="book-form" style="padding: 0;">
+        <input type="hidden" id="form-book-id" value="">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="form-book-title">Book Title *</label>
+            <input type="text" id="form-book-title" required placeholder="e.g. Sahih Al-Bukhari">
+          </div>
+          <div class="form-group">
+            <label for="form-book-author">Author *</label>
+            <input type="text" id="form-book-author" required placeholder="e.g. Imam Al-Bukhari">
+          </div>
+        </div>
+
+        <div class="form-row form-row-3">
+          <div class="form-group">
+            <label for="form-book-price">Price (Rs.) *</label>
+            <input type="number" id="form-book-price" required min="0" step="1" placeholder="1500">
+          </div>
+          <div class="form-group">
+            <label for="form-book-category">Category *</label>
+            <select id="form-book-category" required>
+              <option value="">Select Category</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="form-book-language">Language</label>
+            <input type="text" id="form-book-language" placeholder="e.g. English/Arabic" value="English">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="form-book-description">Description *</label>
+          <textarea id="form-book-description" required rows="4" placeholder="Write a brief description of the book..."></textarea>
+        </div>
+
+        <div class="form-row form-row-3">
+          <div class="form-group">
+            <label for="form-book-color">Cover Color</label>
+            <div class="color-picker-wrapper">
+              <input type="color" id="form-book-color" value="#1B6B3A">
+              <span class="color-value" id="color-value">#1B6B3A</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="form-book-imageurl">Image URL (optional)</label>
+            <input type="url" id="form-book-imageurl" placeholder="https://example.com/book-cover.jpg">
+          </div>
+          <div class="form-group">
+            <label>Options</label>
+            <div class="form-toggles">
+              <label class="toggle-label">
+                <input type="checkbox" id="form-book-featured">
+                <span class="toggle-text">⭐ Featured</span>
+              </label>
+              <label class="toggle-label">
+                <input type="checkbox" id="form-book-instock" checked>
+                <span class="toggle-text">✅ In Stock</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" id="btn-reset-form">Reset</button>
+          <button type="submit" class="btn btn-gold btn-lg" id="btn-submit-form">
+            <span id="submit-btn-text">Add Book</span>
+            <span id="submit-spinner" class="btn-spinner" style="display:none;"></span>
+          </button>
+        </div>
+
+        <div id="form-error" class="form-error" style="display:none;"></div>
+        <div id="form-success" class="form-success" style="display:none;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── Add/Edit Category Modal ──────────────────────────── -->
+  <div class="modal-overlay" id="category-modal" style="display:none;">
+    <div class="modal glass-card-static" style="text-align: left;">
+      <h3 id="category-form-title" style="margin-bottom: 20px;">Add New Category</h3>
+      <form id="category-form">
+        <input type="hidden" id="form-category-id" value="">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label style="display:block; margin-bottom:8px; font-weight:500;">Name *</label>
+          <input type="text" id="form-category-name" required placeholder="e.g. History" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-subtle); background:var(--bg-primary); color:var(--text-primary);">
+        </div>
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label style="display:block; margin-bottom:8px; font-weight:500;">Description (Optional)</label>
+          <textarea id="form-category-desc" rows="3" placeholder="Brief description..." style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-subtle); background:var(--bg-primary); color:var(--text-primary);"></textarea>
+        </div>
+        <div class="form-actions" style="margin-top: 24px; display:flex; gap:12px; justify-content:flex-end;">
+          <button type="button" class="btn btn-outline" id="btn-close-category-modal">Cancel</button>
+          <button type="submit" class="btn btn-gold" id="btn-submit-category">Save</button>
+        </div>
+        <div id="category-form-error" class="form-error" style="display:none;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── Delete Confirmation Modal (Books) ────────────────── -->
+  <div class="modal-overlay" id="delete-modal" style="display:none;">
+    <div class="modal glass-card-static">
+      <div class="modal-icon">⚠️</div>
+      <h3>Delete Book</h3>
+      <p>Are you sure you want to delete <strong id="delete-book-title"></strong>? This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="btn-cancel-delete">Cancel</button>
+        <button class="btn" id="btn-confirm-delete" style="background: #E74C3C; color: #fff;">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Delete Confirmation Modal (Categories) ───────────── -->
+  <div class="modal-overlay" id="delete-category-modal" style="display:none;">
+    <div class="modal glass-card-static">
+      <div class="modal-icon">⚠️</div>
+      <h3>Delete Category</h3>
+      <p>Are you sure you want to delete <strong id="delete-category-title"></strong>? All books in this category will be permanently deleted.</p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="btn-cancel-delete-category">Cancel</button>
+        <button class="btn" id="btn-confirm-delete-category" style="background: #E74C3C; color: #fff;">Delete All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Scripts ─────────────────────────────────────────── -->
+  <script src="js/admin.js"></script>
+</body>
+</html>
