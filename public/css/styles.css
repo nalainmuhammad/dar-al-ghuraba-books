@@ -344,6 +344,15 @@ p {
   box-shadow: var(--shadow-md);
 }
 
+/* Fix CSS Stacking Context bug on mobile: 
+   backdrop-filter creates a new containing block for position:fixed.
+   This breaks the mobile menu overlay z-index. We must disable it when open. */
+body.menu-open .navbar.scrolled {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: var(--bg-secondary); /* Fallback to solid background so it still looks good */
+}
+
 .navbar .container {
   display: flex;
   align-items: center;

@@ -238,12 +238,7 @@ async function initCarousel() {
   }
 }
 
-  /* Recalculate on resize */
-  window.addEventListener('resize', () => {
-    visibleCards = Math.floor(track.parentElement.offsetWidth / cardWidth) || 1;
-    goToSlide(0);
-  });
-}
+
 
 /* ─── Categories Renderer ───────────────────────────────── */
 function renderCategories() {
