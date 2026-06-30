@@ -270,24 +270,28 @@ async function initCarousel() {
     });
   }
 
-  /* Auto-scroll every 5 seconds */
-  let autoScroll = setInterval(() => {
-    currentSlide = (currentSlide + 1) % totalSlides;
-    goToSlide(currentSlide);
-  }, 5000);
-
-  function pauseAutoScroll() { clearInterval(autoScroll); }
-  function resumeAutoScroll() {
-    clearInterval(autoScroll);
-    autoScroll = setInterval(() => {
-      currentSlide = (currentSlide + 1) % totalSlides;
-      goToSlide(currentSlide);
-    }, 5000);
-  }
-
-  /* Pause on hover */
-  track.addEventListener('mouseenter', pauseAutoScroll);
-  track.addEventListener('mouseleave', resumeAutoScroll);
+  /* ─── Mouse Wheel Scroll Support ─────────── */
+  let isScrolling = false;
+  track.addEventListener('wheel', (e) => {
+    // Only intercept if they are scrolling horizontally OR if we want to convert vertical to horizontal
+    // Usually carousels convert vertical scroll to horizontal, but the user specifically said "move with mouse scroll".
+    // I'll allow both horizontal and vertical wheel to move the slider, but prevent default only if it's horizontal,
+    // or wait, vertical scroll over a carousel can be annoying if it prevents page scroll.
+    // Let's only use horizontal wheel for horizontal scroll.
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+      e.preventDefault();
+      if (!isScrolling) {
+        isScrolling = true;
+        if (e.deltaX > 0) {
+          currentSlide = (currentSlide + 1) % totalSlides;
+        } else {
+          currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+        }
+        goToSlide(currentSlide);
+        setTimeout(() => isScrolling = false, 400); // debounce
+      }
+    }
+  }, { passive: false });
 
   /* ─── Touch Swipe Support (with angle detection) ────── */
   let touchStartX = 0;
@@ -298,7 +302,6 @@ async function initCarousel() {
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
     isSwiping = false;
-    pauseAutoScroll();
   }, { passive: true });
 
   track.addEventListener('touchmove', (e) => {
@@ -314,10 +317,7 @@ async function initCarousel() {
   }, { passive: false });
 
   track.addEventListener('touchend', (e) => {
-    if (!isSwiping) {
-      resumeAutoScroll();
-      return;
-    }
+    if (!isSwiping) return;
 
     const touchEndX = e.changedTouches[0].clientX;
     const diff = touchStartX - touchEndX;
@@ -336,7 +336,6 @@ async function initCarousel() {
     touchStartX = 0;
     touchStartY = 0;
     isSwiping = false;
-    resumeAutoScroll();
   }, { passive: true });
 
   /* Recalculate on resize */
