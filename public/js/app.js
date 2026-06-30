@@ -96,9 +96,11 @@ function initMobileMenu() {
   // Close when backdrop is tapped
   backdrop.addEventListener('click', closeMenu);
 
-  // Close menu on link click
+  // Close menu on link click with slight delay to ensure navigation triggers on mobile
   links.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', closeMenu);
+    link.addEventListener('click', () => {
+      setTimeout(closeMenu, 150);
+    });
   });
 }
 
