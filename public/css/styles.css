@@ -1682,13 +1682,13 @@ p {
 
   .nav-links.open {
     transform: translateX(0);
-    pointer-events: all;
+    pointer-events: auto;
   }
 
   .nav-links .nav-link {
     font-size: 1.2rem;
     padding: 14px 28px;
-    color: var(--text-primary);
+    color: var(--text-primary) !important;
     width: 100%;
     text-align: center;
   }
