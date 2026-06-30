@@ -96,10 +96,30 @@ function initMobileMenu() {
   // Close when backdrop is tapped
   backdrop.addEventListener('click', closeMenu);
 
-  // Close menu on link click with slight delay to ensure navigation triggers on mobile
+  // NUCLEAR FIX: Force programmatic navigation on mobile.
+  // On some mobile browsers, the default <a> click is silently swallowed
+  // by CSS pointer-events transitions or z-index stacking issues.
+  // We bypass all of that by reading the href and navigating manually.
   links.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', () => {
-      setTimeout(closeMenu, 150);
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (href) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeMenu();
+        window.location.href = href;
+      }
+    });
+
+    // Also handle touchend as a fallback for stubborn mobile browsers
+    link.addEventListener('touchend', (e) => {
+      const href = link.getAttribute('href');
+      if (href) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeMenu();
+        window.location.href = href;
+      }
     });
   });
 }
