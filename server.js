@@ -31,6 +31,7 @@ const adminRoutes = require('./routes/admin');
 const categoryRoutes = require('./routes/categories');
 
 const app = express();
+app.set('trust proxy', 1); // Trust first proxy (Render load balancer)
 const PORT = process.env.PORT || 3000;
 
 /* ─── 1. Security Headers (Helmet) ──────────────────────── */
@@ -75,7 +76,17 @@ app.use(
   })
 );
 
-/* ─── 4. Rate Limiting ──────────────────────────────────── */
+/* ─── 4. Static Files (Frontend) ───────────────────────── */
+// Placed BEFORE rate limiting so static assets don't exhaust the limit
+app.use(
+  express.static(path.join(__dirname, 'public'), {
+    maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0,
+    etag: true,
+    lastModified: true,
+  })
+);
+
+/* ─── 5. Rate Limiting ──────────────────────────────────── */
 // Global rate limiter
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -113,18 +124,9 @@ const authLimiter = rateLimit({
   },
 });
 
-/* ─── 5. Body Parsing ───────────────────────────────────── */
+/* ─── 6. Body Parsing ───────────────────────────────────── */
 app.use(express.json({ limit: '10kb' })); // prevent oversized payloads
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-
-/* ─── 6. Static Files (Frontend) ───────────────────────── */
-app.use(
-  express.static(path.join(__dirname, 'public'), {
-    maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0,
-    etag: true,
-    lastModified: true,
-  })
-);
 
 /* ─── 7. API Routes ─────────────────────────────────────── */
 app.use('/api/books', apiLimiter, bookRoutes);
