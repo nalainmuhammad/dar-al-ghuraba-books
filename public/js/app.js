@@ -76,7 +76,6 @@ function initMobileMenu() {
     links.classList.add('open');
     backdrop.classList.add('active');
     document.body.style.overflow = 'hidden';
-    document.body.classList.add('menu-open');
   }
 
   function closeMenu() {
@@ -84,7 +83,6 @@ function initMobileMenu() {
     links.classList.remove('open');
     backdrop.classList.remove('active');
     document.body.style.overflow = '';
-    document.body.classList.remove('menu-open');
   }
 
   toggle.addEventListener('click', () => {
