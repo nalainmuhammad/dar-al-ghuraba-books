@@ -1,5 +1,5 @@
 /* ============================================================
-   Dar-ul-Ilm Books — Book Model (Mongoose)
+   Dar Al Ghuraba Books — Book Model (Mongoose)
    ============================================================ */
 const mongoose = require('mongoose');
 

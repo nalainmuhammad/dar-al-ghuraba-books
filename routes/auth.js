@@ -1,5 +1,5 @@
 /* ============================================================
-   Dar-ul-Ilm Books — Authentication Routes
+   Dar Al Ghuraba Books — Authentication Routes
    ============================================================
    POST   /api/auth/login   — Admin login, returns JWT
    GET    /api/auth/me      — Verify token, return profile

@@ -1,5 +1,5 @@
 /* ============================================================
-   Dar-ul-Ilm Books — Category API Routes
+   Dar Al Ghuraba Books — Category API Routes
    ============================================================
    GET    /api/categories     Public   — List all categories
    POST   /api/categories     Admin    — Create category

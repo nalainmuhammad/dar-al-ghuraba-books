@@ -1,5 +1,5 @@
 /* ============================================================
-   Dar-ul-Ilm Books — Book API Routes
+   Dar Al Ghuraba Books — Book API Routes
    ============================================================
    GET    /api/books                  Public   — List/search/filter books
    GET    /api/books/filters/options  Public   — Get filter dropdown values

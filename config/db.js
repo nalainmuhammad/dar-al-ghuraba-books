@@ -1,5 +1,5 @@
 /* ============================================================
-   Dar-ul-Ilm Books — MongoDB Connection
+   Dar Al Ghuraba Books — MongoDB Connection
    ============================================================ */
 const mongoose = require('mongoose');
 

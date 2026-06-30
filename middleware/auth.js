@@ -1,5 +1,5 @@
 /* ============================================================
-   Dar-ul-Ilm Books — JWT Authentication Middleware
+   Dar Al Ghuraba Books — JWT Authentication Middleware
    ============================================================ */
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');

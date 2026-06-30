@@ -1,5 +1,5 @@
 /* ============================================================
-   Dar-ul-Ilm Books — Admin User Model (Mongoose)
+   Dar Al Ghuraba Books — Admin User Model (Mongoose)
    ============================================================ */
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');

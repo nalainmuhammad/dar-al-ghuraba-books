@@ -1,7 +1,7 @@
 const dns = require('dns');
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 /* ============================================================
-   Dar-ul-Ilm Books — Express Server Entry Point
+   Dar Al Ghuraba Books — Express Server Entry Point
    ============================================================
    Production-ready server with:
    • Helmet security headers
@@ -138,7 +138,7 @@ app.get('/api/config', (req, res) => {
     success: true,
     data: {
       whatsappNumber: process.env.WHATSAPP_NUMBER || '923708998986',
-      storeName: 'Dar-ul-Ilm Books',
+      storeName: 'Dar Al Ghuraba Books',
     },
   });
 });
@@ -147,7 +147,7 @@ app.get('/api/config', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
-    message: 'Dar-ul-Ilm Books API is running',
+    message: 'Dar Al Ghuraba Books API is running',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
   });
@@ -174,7 +174,7 @@ const startServer = async () => {
     await connectDB();
 
     app.listen(PORT, () => {
-      console.log(`\n🕌  Dar-ul-Ilm Books Server`);
+      console.log(`\n🕌  Dar Al Ghuraba Books Server`);
       console.log(`   ━━━━━━━━━━━━━━━━━━━━━━━━━`);
       console.log(`   🌐  URL:         http://localhost:${PORT}`);
       console.log(`   📦  Environment: ${process.env.NODE_ENV || 'development'}`);

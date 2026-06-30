@@ -1,5 +1,5 @@
 /* ============================================================
-   Dar-ul-Ilm Books — Admin Dashboard Routes
+   Dar Al Ghuraba Books — Admin Dashboard Routes
    ============================================================
    GET    /api/admin/stats   — Dashboard statistics
    ============================================================ */

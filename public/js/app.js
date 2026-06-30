@@ -1,5 +1,5 @@
 /* ============================================================
-   Dar-ul-Ilm Books — Core Application Logic
+   Dar Al Ghuraba Books — Core Application Logic
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,7 +16,7 @@ function initThemeToggle() {
   const toggle = document.getElementById('theme-toggle');
   if (!toggle) return;
 
-  const saved = localStorage.getItem('dar-ul-ilm-theme');
+  const saved = localStorage.getItem('dar-al-ghuraba-theme');
   if (saved) {
     document.documentElement.setAttribute('data-theme', saved);
     updateThemeIcon(toggle, saved);
@@ -30,7 +30,7 @@ function initThemeToggle() {
     const current = document.documentElement.getAttribute('data-theme');
     const next = current === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('dar-ul-ilm-theme', next);
+    localStorage.setItem('dar-al-ghuraba-theme', next);
     updateThemeIcon(toggle, next);
   });
 }
@@ -57,25 +57,48 @@ function initNavbar() {
   onScroll();
 }
 
-/* ─── Mobile Menu ───────────────────────────────────────── */
+/* ─── Mobile Menu (Slide-out + Backdrop + Scroll Lock) ──── */
 function initMobileMenu() {
   const toggle = document.getElementById('mobile-toggle');
   const links = document.getElementById('nav-links');
   if (!toggle || !links) return;
 
+  // Create backdrop element
+  let backdrop = document.querySelector('.mobile-nav-backdrop');
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.className = 'mobile-nav-backdrop';
+    document.body.appendChild(backdrop);
+  }
+
+  function openMenu() {
+    toggle.classList.add('active');
+    links.classList.add('open');
+    backdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    toggle.classList.remove('active');
+    links.classList.remove('open');
+    backdrop.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
   toggle.addEventListener('click', () => {
-    toggle.classList.toggle('active');
-    links.classList.toggle('open');
-    document.body.style.overflow = links.classList.contains('open') ? 'hidden' : '';
+    if (links.classList.contains('open')) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
   });
 
-  /* Close menu on link click */
+  // Close when backdrop is tapped
+  backdrop.addEventListener('click', closeMenu);
+
+  // Close menu on link click
   links.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', () => {
-      toggle.classList.remove('active');
-      links.classList.remove('open');
-      document.body.style.overflow = '';
-    });
+    link.addEventListener('click', closeMenu);
   });
 }
 

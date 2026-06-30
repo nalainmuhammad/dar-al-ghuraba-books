@@ -1,5 +1,5 @@
 /* ============================================================
-   Dar-ul-Ilm Books — Seed Categories
+   Dar Al Ghuraba Books — Seed Categories
    ============================================================ */
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 const mongoose = require('mongoose');

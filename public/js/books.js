@@ -1,5 +1,5 @@
 /* ============================================================
-   Dar-ul-Ilm Books — API Client (Replaces Hardcoded Data)
+   Dar Al Ghuraba Books — API Client (Replaces Hardcoded Data)
    ============================================================
    All book data now fetched from the Node.js API.
    Provides the same function interface used by components.js.
@@ -30,7 +30,7 @@ loadConfig();
 /* ─── Helper: Build WhatsApp order URL ─────────────────── */
 function getWhatsAppURL(bookTitle) {
   const message = encodeURIComponent(
-    `Assalamu Alaikum, I would like to order the following book from Dar-ul-Ilm Books: ${bookTitle}`
+    `Assalamu Alaikum, I would like to order the following book from Dar Al Ghuraba Books: ${bookTitle}`
   );
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
 }

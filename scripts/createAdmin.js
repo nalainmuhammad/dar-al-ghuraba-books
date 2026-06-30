@@ -1,5 +1,5 @@
 /* ============================================================
-   Dar-ul-Ilm Books — Standalone Admin User Creator
+   Dar Al Ghuraba Books — Standalone Admin User Creator
    ============================================================
    Usage: node scripts/createAdmin.js
    Reads ADMIN_EMAIL and ADMIN_PASSWORD from .env
@@ -26,7 +26,7 @@ const createAdmin = async () => {
     const admin = await User.create({
       email,
       password,
-      name: 'Dar-ul-Ilm Admin',
+      name: 'Dar Al Ghuraba Admin',
       role: 'admin',
     });
 

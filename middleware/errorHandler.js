@@ -1,5 +1,5 @@
 /* ============================================================
-   Dar-ul-Ilm Books — Centralized Error Handler Middleware
+   Dar Al Ghuraba Books — Centralized Error Handler Middleware
    ============================================================ */
 
 /**

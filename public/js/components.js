@@ -1,5 +1,5 @@
 /* ============================================================
-   Dar-ul-Ilm Books — Reusable UI Components
+   Dar Al Ghuraba Books — Reusable UI Components
    ============================================================
    Updated to work with the async API client (books.js).
    Carousel and Catalog now fetch data from the server.
@@ -8,6 +8,7 @@
 /* ─── Book Card Renderer ────────────────────────────────── */
 function renderBookCard(book, extraClass = '') {
   const whatsappURL = getWhatsAppURL(book.title);
+  const bookId = book._id || book.id;
 
   // Use imageUrl if available, otherwise fall back to CSS gradient cover
   const coverContent = book.imageUrl
@@ -19,7 +20,7 @@ function renderBookCard(book, extraClass = '') {
       </div>`;
 
   return `
-    <div class="book-card ${extraClass}" id="book-${book._id || book.id}">
+    <div class="book-card ${extraClass}" id="book-${bookId}" data-book-id="${bookId}">
       <div class="book-card-image">
         ${coverContent}
         ${book.featured ? '<span class="book-card-badge">Featured</span>' : ''}
@@ -32,7 +33,7 @@ function renderBookCard(book, extraClass = '') {
         <p class="book-card-description">${book.description}</p>
         <div class="book-card-footer">
           <span class="book-card-price"><span class="currency">Rs.</span>${parseFloat(book.price).toFixed(2)}</span>
-          <a href="${whatsappURL}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm" aria-label="Order ${book.title} via WhatsApp">
+          <a href="${whatsappURL}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm book-card-order-btn" aria-label="Order ${book.title} via WhatsApp">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             Order
           </a>
@@ -60,7 +61,6 @@ function showLoading(container) {
       <p style="color: var(--text-muted); font-size: 0.95rem;">Loading books...</p>
     </div>
   `;
-  // Add spin animation if not present
   if (!document.getElementById('loading-styles')) {
     const style = document.createElement('style');
     style.id = 'loading-styles';
@@ -69,16 +69,145 @@ function showLoading(container) {
   }
 }
 
-/* ─── Featured Carousel (Async) ─────────────────────────── */
+/* ─── Book Detail Modal ─────────────────────────────────── */
+let _bookDetailOverlay = null;
+
+function ensureBookDetailOverlay() {
+  if (_bookDetailOverlay) return _bookDetailOverlay;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'book-detail-overlay';
+  overlay.id = 'book-detail-overlay';
+  overlay.innerHTML = '<div class="book-detail-card" id="book-detail-card"></div>';
+  document.body.appendChild(overlay);
+
+  // Close on overlay click (not on card)
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeBookDetail();
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('active')) {
+      closeBookDetail();
+    }
+  });
+
+  _bookDetailOverlay = overlay;
+  return overlay;
+}
+
+async function openBookDetail(bookId) {
+  const overlay = ensureBookDetailOverlay();
+  const card = document.getElementById('book-detail-card');
+
+  // Show overlay with loading state
+  card.innerHTML = `
+    <div style="padding: 60px; text-align: center;">
+      <div style="width: 40px; height: 40px; border: 3px solid var(--border-subtle); border-top-color: var(--accent-emerald); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px;"></div>
+      <p style="color: var(--text-muted);">Loading book details...</p>
+    </div>`;
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  try {
+    const res = await fetch(`${API_BASE}/books/${bookId}`);
+    const data = await res.json();
+
+    if (!data.success) throw new Error('Book not found');
+
+    const book = data.data;
+    const whatsappURL = getWhatsAppURL(book.title);
+
+    const coverHTML = book.imageUrl
+      ? `<img src="${book.imageUrl}" alt="${book.title}">`
+      : `<div class="book-cover-art" style="background: linear-gradient(135deg, ${book.color || '#1B6B3A'}, ${adjustColor(book.color || '#1B6B3A', -30)});">
+          <span class="book-icon">📖</span>
+          <span class="book-cover-title">${book.title}</span>
+          <span class="book-cover-author">${book.author}</span>
+        </div>`;
+
+    card.innerHTML = `
+      <button class="book-detail-close" id="book-detail-close" aria-label="Close">✕</button>
+      <div class="book-detail-cover">${coverHTML}</div>
+      <div class="book-detail-body">
+        <div class="book-detail-badges">
+          <span class="book-detail-badge book-detail-badge-category">${book.category}</span>
+          ${book.featured ? '<span class="book-detail-badge book-detail-badge-featured">⭐ Featured</span>' : ''}
+          ${book.inStock !== false
+            ? '<span class="book-detail-badge book-detail-badge-stock">In Stock</span>'
+            : '<span class="book-detail-badge book-detail-badge-out">Out of Stock</span>'}
+        </div>
+        <h2 class="book-detail-title">${book.title}</h2>
+        <p class="book-detail-author">by ${book.author}</p>
+        <div class="book-detail-meta">
+          <div class="book-detail-meta-item">
+            <span class="book-detail-meta-label">Category</span>
+            <span class="book-detail-meta-value">${book.category}</span>
+          </div>
+          <div class="book-detail-meta-item">
+            <span class="book-detail-meta-label">Language</span>
+            <span class="book-detail-meta-value">${book.language || 'English'}</span>
+          </div>
+          <div class="book-detail-meta-item">
+            <span class="book-detail-meta-label">Price</span>
+            <span class="book-detail-meta-value">Rs. ${parseFloat(book.price).toFixed(2)}</span>
+          </div>
+        </div>
+        <p class="book-detail-description">${book.description}</p>
+        <div class="book-detail-footer">
+          <span class="book-detail-price"><span class="currency">Rs.</span>${parseFloat(book.price).toFixed(2)}</span>
+          <a href="${whatsappURL}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Order via WhatsApp
+          </a>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('book-detail-close').addEventListener('click', closeBookDetail);
+  } catch (error) {
+    card.innerHTML = `
+      <button class="book-detail-close" id="book-detail-close" aria-label="Close">✕</button>
+      <div style="padding: 60px; text-align: center;">
+        <p style="font-size: 2rem; margin-bottom: 12px;">😔</p>
+        <h3 style="color: var(--text-primary); margin-bottom: 8px;">Could not load book details</h3>
+        <p style="color: var(--text-muted);">${error.message}</p>
+      </div>`;
+    document.getElementById('book-detail-close').addEventListener('click', closeBookDetail);
+  }
+}
+
+function closeBookDetail() {
+  const overlay = document.getElementById('book-detail-overlay');
+  if (overlay) {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+/* ─── Book Card Click Delegation ────────────────────────── */
+function initBookCardClicks(container) {
+  if (!container) return;
+  container.addEventListener('click', (e) => {
+    // Don't intercept Order button clicks
+    if (e.target.closest('.book-card-order-btn')) return;
+
+    const card = e.target.closest('.book-card[data-book-id]');
+    if (card) {
+      openBookDetail(card.dataset.bookId);
+    }
+  });
+}
+
+/* ─── Featured Carousel (Async + Touch Swipe) ───────────── */
 async function initCarousel() {
   const track = document.getElementById('carousel-track');
   const dotsContainer = document.getElementById('carousel-dots');
   if (!track) return;
 
-  // Show loading
   showLoading(track);
 
-  // Fetch featured books from API
   const featured = await getFeaturedBooks();
 
   if (!featured.length) {
@@ -87,6 +216,9 @@ async function initCarousel() {
   }
 
   track.innerHTML = featured.map(b => renderBookCard(b)).join('');
+
+  // Attach book card click delegation
+  initBookCardClicks(track);
 
   /* Calculate slides */
   let currentSlide = 0;
@@ -144,14 +276,68 @@ async function initCarousel() {
     goToSlide(currentSlide);
   }, 5000);
 
-  /* Pause on hover */
-  track.addEventListener('mouseenter', () => clearInterval(autoScroll));
-  track.addEventListener('mouseleave', () => {
+  function pauseAutoScroll() { clearInterval(autoScroll); }
+  function resumeAutoScroll() {
+    clearInterval(autoScroll);
     autoScroll = setInterval(() => {
       currentSlide = (currentSlide + 1) % totalSlides;
       goToSlide(currentSlide);
     }, 5000);
-  });
+  }
+
+  /* Pause on hover */
+  track.addEventListener('mouseenter', pauseAutoScroll);
+  track.addEventListener('mouseleave', resumeAutoScroll);
+
+  /* ─── Touch Swipe Support (with angle detection) ────── */
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let isSwiping = false;
+
+  track.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    isSwiping = false;
+    pauseAutoScroll();
+  }, { passive: true });
+
+  track.addEventListener('touchmove', (e) => {
+    if (!touchStartX) return;
+    const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
+    const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
+
+    // Only consider horizontal swipe if angle < 45°
+    if (deltaX > 10 && deltaX > deltaY) {
+      isSwiping = true;
+      e.preventDefault(); // Prevent vertical scroll during horizontal swipe
+    }
+  }, { passive: false });
+
+  track.addEventListener('touchend', (e) => {
+    if (!isSwiping) {
+      resumeAutoScroll();
+      return;
+    }
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        // Swipe left → next
+        currentSlide = (currentSlide + 1) % totalSlides;
+      } else {
+        // Swipe right → prev
+        currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      }
+      goToSlide(currentSlide);
+    }
+
+    touchStartX = 0;
+    touchStartY = 0;
+    isSwiping = false;
+    resumeAutoScroll();
+  }, { passive: true });
 
   /* Recalculate on resize */
   window.addEventListener('resize', () => {
@@ -182,7 +368,6 @@ function renderCategories() {
     </a>
   `).join('');
 
-  /* Re-observe for scroll reveal */
   initScrollReveal();
 }
 
@@ -199,7 +384,9 @@ async function initCatalog() {
 
   if (!grid) return;
 
-  /* ─── Populate filter dropdowns from API ───────────────── */
+  // Attach book card click delegation for catalog grid
+  initBookCardClicks(grid);
+
   const filterOptions = await getFilterOptions();
 
   if (categoryFilter) {
@@ -217,22 +404,18 @@ async function initCatalog() {
       filterOptions.languages.map(l => `<option value="${l}">${l}</option>`).join('');
   }
 
-  /* Read URL params for initial filters */
   const params = new URLSearchParams(window.location.search);
   const initialCategory = params.get('category');
   if (initialCategory && categoryFilter) {
     categoryFilter.value = initialCategory;
   }
 
-  /* State */
   const ITEMS_PER_PAGE = 12;
   let currentPage = 1;
 
-  /* ─── Fetch & Render Books ─────────────────────────────── */
   async function render() {
     showLoading(grid);
 
-    // Build query params
     const queryParams = {
       page: currentPage,
       limit: ITEMS_PER_PAGE,
@@ -253,17 +436,14 @@ async function initCatalog() {
     const sort = sortSelect ? sortSelect.value : 'default';
     if (sort && sort !== 'default') queryParams.sort = sort;
 
-    // Fetch from API
     const result = await fetchBooks(queryParams);
     const books = result.data || [];
     const pagination = result.pagination || {};
 
-    // Update results count
     if (resultsCount) {
       resultsCount.textContent = `Showing ${books.length} of ${pagination.totalBooks || 0} books`;
     }
 
-    // Render books or empty state
     if (books.length === 0) {
       grid.innerHTML = `
         <div class="no-results" style="grid-column: 1 / -1;">
@@ -284,7 +464,6 @@ async function initCatalog() {
 
     let html = `<button class="page-btn" ${current === 1 ? 'disabled' : ''} data-page="${current - 1}">‹</button>`;
 
-    // Smart pagination: show max 7 page buttons
     const maxVisible = 7;
     let startPage = Math.max(1, current - Math.floor(maxVisible / 2));
     let endPage = Math.min(totalPages, startPage + maxVisible - 1);
@@ -337,7 +516,6 @@ async function initCatalog() {
     if (el) el.addEventListener('change', () => { currentPage = 1; render(); });
   });
 
-  // Initial render
   render();
 }
 
@@ -351,11 +529,7 @@ function initFAQ() {
 
     question.addEventListener('click', () => {
       const isActive = item.classList.contains('active');
-
-      /* Close all */
       items.forEach(i => i.classList.remove('active'));
-
-      /* Toggle clicked */
       if (!isActive) {
         item.classList.add('active');
       }
@@ -380,7 +554,6 @@ function initContactForm() {
       return;
     }
 
-    /* Build WhatsApp message with form data */
     const waMessage = encodeURIComponent(
       `Assalamu Alaikum,\n\nMy name is ${name}.\nEmail: ${email}\n\nMessage:\n${message}`
     );
@@ -414,7 +587,6 @@ function showNotification(message, type = 'success') {
     setTimeout(() => notification.remove(), 300);
   }, 3000);
 
-  /* Add animation keyframes if not already present */
   if (!document.getElementById('notification-styles')) {
     const style = document.createElement('style');
     style.id = 'notification-styles';

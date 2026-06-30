@@ -1,7 +1,7 @@
 const dns = require('dns');
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 /* ============================================================
-   Dar-ul-Ilm Books — Category Model (Mongoose)
+   Dar Al Ghuraba Books — Category Model (Mongoose)
    ============================================================ */
 const mongoose = require('mongoose');
 

@@ -1,7 +1,7 @@
 const dns = require('dns');
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 /* ============================================================
-   Dar-ul-Ilm Books — Database Seeder
+   Dar Al Ghuraba Books — Database Seeder
    ============================================================
    Populates MongoDB with:
    • All 30 books from the original hardcoded inventory
@@ -332,7 +332,7 @@ const books = [
 /* ─── Seed Function ─────────────────────────────────────── */
 const seedDatabase = async () => {
   try {
-    console.log('\n🌱 Dar-ul-Ilm Books — Database Seeder');
+    console.log('\n🌱 Dar Al Ghuraba Books — Database Seeder');
     console.log('   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
     // Connect to MongoDB
@@ -363,7 +363,7 @@ const seedDatabase = async () => {
     const admin = await User.create({
       email: adminEmail,
       password: adminPassword,
-      name: 'Dar-ul-Ilm Admin',
+      name: 'Dar Al Ghuraba Admin',
       role: 'admin',
     });
 
