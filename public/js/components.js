@@ -220,123 +220,23 @@ async function initCarousel() {
   // Attach book card click delegation
   initBookCardClicks(track);
 
-  /* Calculate slides */
-  let currentSlide = 0;
-  const cardWidth = 284; /* 260 + 24 gap */
-  let visibleCards = Math.floor(track.parentElement.offsetWidth / cardWidth) || 1;
-  const totalSlides = Math.max(1, Math.ceil(featured.length / visibleCards));
-
-  /* Render dots */
-  if (dotsContainer) {
-    dotsContainer.innerHTML = '';
-    for (let i = 0; i < totalSlides; i++) {
-      const dot = document.createElement('button');
-      dot.className = `carousel-dot ${i === 0 ? 'active' : ''}`;
-      dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
-      dot.addEventListener('click', () => goToSlide(i));
-      dotsContainer.appendChild(dot);
-    }
-  }
-
-  function goToSlide(index) {
-    currentSlide = index;
-    const offset = -(currentSlide * visibleCards * cardWidth);
-    track.style.transform = `translateX(${offset}px)`;
-    updateDots();
-  }
-
-  function updateDots() {
-    if (!dotsContainer) return;
-    dotsContainer.querySelectorAll('.carousel-dot').forEach((dot, i) => {
-      dot.classList.toggle('active', i === currentSlide);
-    });
-  }
-
-  /* Arrow buttons */
+  /* Arrow buttons for native scroll */
+  const wrapper = track.parentElement;
   const prevBtn = document.getElementById('carousel-prev');
   const nextBtn = document.getElementById('carousel-next');
 
   if (prevBtn) {
     prevBtn.addEventListener('click', () => {
-      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-      goToSlide(currentSlide);
+      wrapper.scrollBy({ left: -304, behavior: 'smooth' }); // 280 width + 24 gap
     });
   }
 
   if (nextBtn) {
     nextBtn.addEventListener('click', () => {
-      currentSlide = (currentSlide + 1) % totalSlides;
-      goToSlide(currentSlide);
+      wrapper.scrollBy({ left: 304, behavior: 'smooth' });
     });
   }
-
-  /* ─── Mouse Wheel Scroll Support ─────────── */
-  let isScrolling = false;
-  track.addEventListener('wheel', (e) => {
-    // Only intercept if they are scrolling horizontally OR if we want to convert vertical to horizontal
-    // Usually carousels convert vertical scroll to horizontal, but the user specifically said "move with mouse scroll".
-    // I'll allow both horizontal and vertical wheel to move the slider, but prevent default only if it's horizontal,
-    // or wait, vertical scroll over a carousel can be annoying if it prevents page scroll.
-    // Let's only use horizontal wheel for horizontal scroll.
-    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-      e.preventDefault();
-      if (!isScrolling) {
-        isScrolling = true;
-        if (e.deltaX > 0) {
-          currentSlide = (currentSlide + 1) % totalSlides;
-        } else {
-          currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-        }
-        goToSlide(currentSlide);
-        setTimeout(() => isScrolling = false, 400); // debounce
-      }
-    }
-  }, { passive: false });
-
-  /* ─── Touch Swipe Support (with angle detection) ────── */
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let isSwiping = false;
-
-  track.addEventListener('touchstart', (e) => {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    isSwiping = false;
-  }, { passive: true });
-
-  track.addEventListener('touchmove', (e) => {
-    if (!touchStartX) return;
-    const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
-    const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
-
-    // Only consider horizontal swipe if angle < 45°
-    if (deltaX > 10 && deltaX > deltaY) {
-      isSwiping = true;
-      e.preventDefault(); // Prevent vertical scroll during horizontal swipe
-    }
-  }, { passive: false });
-
-  track.addEventListener('touchend', (e) => {
-    if (!isSwiping) return;
-
-    const touchEndX = e.changedTouches[0].clientX;
-    const diff = touchStartX - touchEndX;
-
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) {
-        // Swipe left → next
-        currentSlide = (currentSlide + 1) % totalSlides;
-      } else {
-        // Swipe right → prev
-        currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-      }
-      goToSlide(currentSlide);
-    }
-
-    touchStartX = 0;
-    touchStartY = 0;
-    isSwiping = false;
-  }, { passive: true });
+}
 
   /* Recalculate on resize */
   window.addEventListener('resize', () => {

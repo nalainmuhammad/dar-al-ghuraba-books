@@ -291,8 +291,16 @@ p {
 }
 
 .btn-whatsapp:hover {
-  box-shadow: 0 6px 25px rgba(37, 211, 102, 0.4);
+  background: #1EBE5D;
+  border-color: #1EBE5D;
+  color: #FFFFFF;
   transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+
+/* Fix contrast in dark mode */
+[data-theme="dark"] .btn-whatsapp {
+  color: #FFFFFF !important;
 }
 
 .btn-outline {
@@ -632,15 +640,23 @@ p {
 
 .carousel-wrapper {
   position: relative;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   margin: 0 -12px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+
+.carousel-wrapper::-webkit-scrollbar {
+  display: none; /* Safari/Chrome */
 }
 
 .carousel-track {
   display: flex;
   gap: 24px;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 12px;
+  width: max-content;
 }
 
 .carousel-controls {
@@ -697,17 +713,17 @@ p {
 
 /* ─── Book Cards ────────────────────────────────────────── */
 .book-card {
-  min-width: 260px;
-  max-width: 280px;
+  width: 280px;
+  background: var(--bg-secondary);
   border-radius: var(--card-radius);
   overflow: hidden;
-  background: var(--bg-glass-strong);
-  border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
+  border: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
-  cursor: pointer;
+  position: relative;
+  scroll-snap-align: start;
 }
 
 .book-card:hover {
@@ -717,21 +733,19 @@ p {
 }
 
 .book-card-image {
-  height: 220px;
-  position: relative;
-  overflow: hidden;
+  height: 240px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   background: var(--bg-tertiary);
+  position: relative; /* Anchor for badges */
 }
 
 .book-card-image img.book-cover-img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  padding: 8px;
+  object-fit: cover;
 }
 
 .book-card-image .book-cover-art {
@@ -1658,6 +1672,10 @@ p {
     --section-padding: 60px;
   }
 
+  body {
+    padding-bottom: 80px; /* Prevent WhatsApp button from blocking UI */
+  }
+
   /* Mobile nav — 70vw slide-out panel from right */
   .nav-links {
     position: fixed;
@@ -1947,8 +1965,7 @@ p {
 .book-detail-cover img {
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain;
-  padding: 16px;
+  object-fit: cover;
 }
 
 .book-detail-cover .book-cover-art {
