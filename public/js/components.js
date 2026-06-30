@@ -251,7 +251,7 @@ function renderCategories() {
     { name: 'Seerah', icon: '🕌', desc: 'Prophetic biography & companions' },
     { name: 'Fiqh', icon: '⚖️', desc: 'Islamic jurisprudence & rulings' },
     { name: 'Aqeedah', icon: '🕋', desc: 'Islamic creed & theology' },
-    { name: 'Arabic Language', icon: '✍️', desc: 'Arabic grammar & vocabulary' }
+    { name: 'Islamic Clothing', icon: '👕', desc: 'Premium Kufis, modest wear & accessories' }
   ];
 
   grid.innerHTML = categoryData.map((cat, i) => `

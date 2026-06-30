@@ -332,7 +332,7 @@ p {
   left: 0;
   right: 0;
   height: var(--nav-height);
-  z-index: 1000;
+  z-index: 1020; /* Increased to be above mobile-nav-backdrop (1005) */
   transition: all var(--transition-base);
 }
 
