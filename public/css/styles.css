@@ -351,6 +351,7 @@ body.menu-open .navbar.scrolled {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   background: var(--bg-secondary); /* Fallback to solid background so it still looks good */
+  transition: none;
 }
 
 .navbar .container {
@@ -1025,6 +1026,7 @@ body.menu-open .navbar.scrolled {
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 24px;
   padding: 40px 0;
+  justify-items: center;
 }
 
 .books-grid .book-card {
