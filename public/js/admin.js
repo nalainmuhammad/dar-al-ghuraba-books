@@ -587,6 +587,26 @@ async function handleBookSubmit(e) {
   btnText.style.display = 'none';
   spinner.style.display = 'inline-block';
 
+  let imageUrl = document.getElementById('form-book-imageurl').value.trim();
+  const fileInput = document.getElementById('form-book-imagefile');
+  if (fileInput && fileInput.files.length > 0) {
+    try {
+      const file = fileInput.files[0];
+      imageUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Failed to read image file'));
+        reader.readAsDataURL(file);
+      });
+    } catch (err) {
+      formError.textContent = err.message;
+      formError.style.display = 'block';
+      btnText.style.display = 'inline';
+      spinner.style.display = 'none';
+      return;
+    }
+  }
+
   const bookData = {
     title: document.getElementById('form-book-title').value.trim(),
     author: document.getElementById('form-book-author').value.trim(),
@@ -595,7 +615,7 @@ async function handleBookSubmit(e) {
     language: document.getElementById('form-book-language').value.trim() || 'English',
     description: document.getElementById('form-book-description').value.trim(),
     color: document.getElementById('form-book-color').value,
-    imageUrl: document.getElementById('form-book-imageurl').value.trim(),
+    imageUrl: imageUrl,
     featured: document.getElementById('form-book-featured').checked,
     inStock: document.getElementById('form-book-instock').checked,
   };
@@ -653,6 +673,8 @@ window.editBook = async (id) => {
     document.getElementById('form-book-color').value = book.color || '#1B6B3A';
     document.getElementById('color-value').textContent = book.color || '#1B6B3A';
     document.getElementById('form-book-imageurl').value = book.imageUrl || '';
+    const fileInput = document.getElementById('form-book-imagefile');
+    if (fileInput) fileInput.value = '';
     document.getElementById('form-book-featured').checked = book.featured;
     document.getElementById('form-book-instock').checked = book.inStock !== false;
 

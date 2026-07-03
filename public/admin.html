@@ -256,8 +256,9 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="form-book-imageurl">Image URL (optional)</label>
-            <input type="url" id="form-book-imageurl" placeholder="https://example.com/book-cover.jpg">
+            <label>Image (File or URL)</label>
+            <input type="file" id="form-book-imagefile" accept="image/*" style="margin-bottom: 8px; width: 100%; border-radius: 8px; padding: 6px; border: 1px solid var(--border-subtle); background: var(--bg-primary); color: var(--text-primary);">
+            <input type="text" id="form-book-imageurl" placeholder="Or enter Image URL (https://example.com/book-cover.jpg)">
           </div>
           <div class="form-group">
             <label>Options</label>

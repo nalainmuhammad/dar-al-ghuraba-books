@@ -125,8 +125,8 @@ const authLimiter = rateLimit({
 });
 
 /* ─── 6. Body Parsing ───────────────────────────────────── */
-app.use(express.json({ limit: '10kb' })); // prevent oversized payloads
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(express.json({ limit: '50mb' })); // allow larger payloads for base64 images
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 /* ─── 7. API Routes ─────────────────────────────────────── */
 app.use('/api/books', apiLimiter, bookRoutes);
