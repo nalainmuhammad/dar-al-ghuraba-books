@@ -1973,23 +1973,27 @@ body.menu-open .navbar.scrolled {
 }
 
 .book-detail-cover {
-  width: auto;
-  height: 350px;
-  margin: 0 auto;
-  aspect-ratio: 1 / 1.35;
+  width: 100%;
+  height: auto;
+  min-height: 200px;
+  max-height: 450px;
   background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: var(--bg-tertiary);
   position: relative;
+  padding: 20px;
 }
 
 .book-detail-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 400px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
 }
 
 .book-detail-cover .book-cover-art {
@@ -2139,12 +2143,23 @@ body.menu-open .navbar.scrolled {
   }
 
   .book-detail-cover {
-    width: auto;
-    height: 250px;
+    width: 100%;
+    height: auto;
+    max-height: 300px;
     margin: 0 auto;
-    aspect-ratio: 1 / 1.35;
-    max-height: none;
+    aspect-ratio: auto;
     background: transparent;
+    padding: 16px;
+  }
+  
+  .book-detail-cover img {
+    max-height: 260px;
+  }
+  
+  .book-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
   }
 
   .book-detail-body {
