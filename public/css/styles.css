@@ -1038,6 +1038,7 @@ body.menu-open .navbar.scrolled {
 }
 
 .books-grid .book-card {
+  width: 100%;
   max-width: 100%;
   min-width: unset;
 }
@@ -1971,10 +1972,11 @@ body.menu-open .navbar.scrolled {
 }
 
 .book-detail-cover {
-  width: 100%;
+  width: auto;
+  height: 350px;
+  margin: 0 auto;
   aspect-ratio: 1 / 1.35;
-  height: auto;
-  max-height: 400px;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2136,7 +2138,12 @@ body.menu-open .navbar.scrolled {
   }
 
   .book-detail-cover {
-    height: auto;
+    width: auto;
+    height: 250px;
+    margin: 0 auto;
+    aspect-ratio: 1 / 1.35;
+    max-height: none;
+    background: transparent;
   }
 
   .book-detail-body {
