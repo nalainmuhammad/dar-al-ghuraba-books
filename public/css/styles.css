@@ -1852,7 +1852,7 @@ body.menu-open .navbar.scrolled {
   }
 
   .book-card-image {
-    height: 180px;
+    height: auto;
   }
 }
 
@@ -1866,7 +1866,8 @@ body.menu-open .navbar.scrolled {
   }
 
   .books-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 
   .category-card {
