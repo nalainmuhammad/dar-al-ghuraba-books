@@ -30,7 +30,6 @@ function renderBookCard(book, extraClass = '') {
         <span class="book-card-category">${book.category}</span>
         <h3 class="book-card-title">${book.title}</h3>
         <p class="book-card-author">by ${book.author}</p>
-        <p class="book-card-description">${book.description}</p>
         <div class="book-card-footer">
           <span class="book-card-price"><span class="currency">Rs.</span>${parseFloat(book.price).toFixed(2)}</span>
           <a href="${whatsappURL}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm book-card-order-btn" aria-label="Order ${book.title} via WhatsApp">

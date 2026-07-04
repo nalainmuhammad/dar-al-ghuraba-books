@@ -755,7 +755,7 @@ body.menu-open .navbar.scrolled {
 .book-card-image img.book-cover-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .book-card-image .book-cover-art {
@@ -1976,7 +1976,7 @@ body.menu-open .navbar.scrolled {
 .book-detail-cover img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .book-detail-cover .book-cover-art {
