@@ -80,7 +80,7 @@ app.use(
 // Placed BEFORE rate limiting so static assets don't exhaust the limit
 app.use(
   express.static(path.join(__dirname, 'public'), {
-    maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0,
+    maxAge: process.env.NODE_ENV === 'production' ? '7d' : 0,
     etag: true,
     lastModified: true,
   })
