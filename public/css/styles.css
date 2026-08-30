@@ -815,10 +815,18 @@ body.menu-open .navbar.scrolled {
   font-family: var(--font-arabic);
 }
 
-.book-card-badge {
+.book-badges-container {
   position: absolute;
   top: 12px;
   right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  z-index: 2;
+}
+
+.book-card-badge {
   padding: 4px 12px;
   background: var(--accent-gold);
   color: #1A1A1A;

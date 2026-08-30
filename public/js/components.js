@@ -20,21 +20,25 @@ function renderBookCard(book, extraClass = '') {
         <span class="book-cover-author">${book.author}</span>
       </div>`;
 
-  let stockBadge = '';
-  if (book.onDemand) {
-    stockBadge = '<span class="book-card-badge book-card-badge-demand">On Demand</span>';
-  } else if (book.inStock !== false) {
-    stockBadge = '<span class="book-card-badge" style="background: #2ECC71; color: white;">In Stock</span>';
-  } else {
-    stockBadge = '<span class="book-card-badge" style="background: #E74C3C; color: white;">Out of Stock</span>';
+  let badgesHtml = '<div class="book-badges-container">';
+  
+  if (book.featured) {
+    badgesHtml += '<span class="book-card-badge">Featured</span>';
   }
+  if (book.onDemand) {
+    badgesHtml += '<span class="book-card-badge book-card-badge-demand">On Demand</span>';
+  }
+  if (book.inStock !== false) {
+    badgesHtml += '<span class="book-card-badge" style="background: #2ECC71; color: white;">In Stock</span>';
+  } else {
+    badgesHtml += '<span class="book-card-badge" style="background: #E74C3C; color: white;">Out of Stock</span>';
+  }
+  badgesHtml += '</div>';
 
   let cartBtnDisabled = '';
   let cartBtnText = 'Add to Cart';
   
-  if (book.onDemand) {
-    cartBtnText = 'Request Book';
-  } else if (book.inStock === false) {
+  if (book.inStock === false) {
     cartBtnDisabled = 'disabled';
     cartBtnText = 'Out of Stock';
   }
@@ -43,8 +47,7 @@ function renderBookCard(book, extraClass = '') {
     <div class="book-card ${extraClass}" id="book-${bookId}" data-book-slug="${slug}">
       <div class="book-card-image">
         ${coverContent}
-        ${book.featured ? '<span class="book-card-badge" style="right: auto; left: 12px;">Featured</span>' : ''}
-        ${stockBadge}
+        ${badgesHtml}
       </div>
       <div class="book-card-body">
         <span class="book-card-category">${book.category}</span>
