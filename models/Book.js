@@ -56,14 +56,6 @@ const bookSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    slug: {
-      type: String,
-      unique: true,
-    },
-    sortOrder: {
-      type: Number,
-      default: 0,
-    },
   },
   {
     timestamps: true, // adds createdAt and updatedAt
@@ -71,22 +63,6 @@ const bookSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
-
-/* ─── Pre-save: Generate Slug ──────────────────────────────
-   Auto-generates slug from title if not present or title changed */
-bookSchema.pre('save', function (next) {
-  if (!this.slug || this.isModified('title')) {
-    let baseSlug = this.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with hyphens
-      .replace(/(^-|-$)+/g, ''); // Remove leading/trailing hyphens
-    
-    // Add a random string or use object id to ensure uniqueness if needed, 
-    // but for simplicity, we'll just use the base slug and handle duplicates in route
-    this.slug = baseSlug;
-  }
-  next();
-});
 
 /* ─── Indexes for Performance ───────────────────────────────
    - Text index: powers the search bar (title, author, description)
@@ -98,6 +74,5 @@ bookSchema.index({ category: 1 });
 bookSchema.index({ featured: 1 });
 bookSchema.index({ category: 1, language: 1 });
 bookSchema.index({ price: 1 });
-bookSchema.index({ sortOrder: 1 });
 
 module.exports = mongoose.model('Book', bookSchema);

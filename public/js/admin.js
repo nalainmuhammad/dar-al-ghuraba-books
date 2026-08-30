@@ -526,7 +526,7 @@ async function loadBooks() {
     const pagination = data.pagination;
 
     if (adminBooks.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8"><div class="table-empty"><h3>No books found</h3></div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7"><div class="table-empty"><h3>No books found</h3></div></td></tr>`;
       document.getElementById('admin-pagination').innerHTML = '';
       return;
     }
@@ -539,7 +539,6 @@ async function loadBooks() {
         <td><strong>Rs. ${parseFloat(book.price).toFixed(2)}</strong></td>
         <td>${book.featured ? '<span class="table-badge table-badge-featured">⭐ Yes</span>' : '—'}</td>
         <td>${book.inStock !== false ? '<span class="table-badge table-badge-in-stock">In Stock</span>' : '<span class="table-badge table-badge-out-of-stock">Out</span>'}</td>
-        <td>${book.sortOrder || 0}</td>
         <td>
           <div class="table-actions">
             <button class="table-btn table-btn-edit" data-action="edit-book" data-id="${book._id}">✏️ Edit</button>
@@ -619,7 +618,6 @@ async function handleBookSubmit(e) {
     imageUrl: imageUrl,
     featured: document.getElementById('form-book-featured').checked,
     inStock: document.getElementById('form-book-instock').checked,
-    sortOrder: parseInt(document.getElementById('form-book-sortorder').value) || 0,
   };
 
   try {
@@ -679,7 +677,6 @@ window.editBook = async (id) => {
     if (fileInput) fileInput.value = '';
     document.getElementById('form-book-featured').checked = book.featured;
     document.getElementById('form-book-instock').checked = book.inStock !== false;
-    document.getElementById('form-book-sortorder').value = book.sortOrder || 0;
 
     document.getElementById('form-title').textContent = 'Edit Book';
     document.getElementById('submit-btn-text').textContent = 'Update Book';
@@ -696,7 +693,6 @@ function clearBookForm() {
   document.getElementById('form-book-color').value = '#1B6B3A';
   document.getElementById('color-value').textContent = '#1B6B3A';
   document.getElementById('form-book-instock').checked = true;
-  document.getElementById('form-book-sortorder').value = 0;
   document.getElementById('form-title').textContent = 'Add New Book';
   document.getElementById('submit-btn-text').textContent = 'Add Book';
   document.getElementById('form-error').style.display = 'none';
