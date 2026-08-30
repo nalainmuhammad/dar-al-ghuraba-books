@@ -20,20 +20,19 @@ function renderBookCard(book, extraClass = '') {
         <span class="book-cover-author">${book.author}</span>
       </div>`;
 
-  let badgesHtml = '<div class="book-badges-container">';
+  let badgesHtml = '';
   
   if (book.featured) {
-    badgesHtml += '<span class="book-card-badge">Featured</span>';
+    badgesHtml += '<span class="book-card-badge badge-top-right">Featured</span>';
   }
   if (book.onDemand) {
-    badgesHtml += '<span class="book-card-badge book-card-badge-demand">On Demand</span>';
+    badgesHtml += '<span class="book-card-badge badge-bottom-left book-card-badge-demand">On Demand</span>';
   }
   if (book.inStock !== false) {
-    badgesHtml += '<span class="book-card-badge" style="background: #2ECC71; color: white;">In Stock</span>';
+    badgesHtml += '<span class="book-card-badge badge-top-left" style="background: #2ECC71; color: white;">In Stock</span>';
   } else {
-    badgesHtml += '<span class="book-card-badge" style="background: #E74C3C; color: white;">Out of Stock</span>';
+    badgesHtml += '<span class="book-card-badge badge-top-left" style="background: #E74C3C; color: white;">Out of Stock</span>';
   }
-  badgesHtml += '</div>';
 
   let cartBtnDisabled = '';
   let cartBtnText = 'Add to Cart';

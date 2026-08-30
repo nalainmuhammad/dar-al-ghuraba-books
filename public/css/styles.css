@@ -815,18 +815,8 @@ body.menu-open .navbar.scrolled {
   font-family: var(--font-arabic);
 }
 
-.book-badges-container {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-end;
-  z-index: 2;
-}
-
 .book-card-badge {
+  position: absolute;
   padding: 4px 12px;
   background: var(--accent-gold);
   color: #1A1A1A;
@@ -835,6 +825,22 @@ body.menu-open .navbar.scrolled {
   border-radius: 20px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  z-index: 2;
+}
+
+.badge-top-left {
+  top: 12px;
+  left: 12px;
+}
+
+.badge-top-right {
+  top: 12px;
+  right: 12px;
+}
+
+.badge-bottom-left {
+  bottom: 12px;
+  left: 12px;
 }
 
 .book-card-badge-demand {
