@@ -56,6 +56,10 @@ const bookSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    onDemand: {
+      type: Boolean,
+      default: false,
+    },
     slug: {
       type: String,
       unique: true,

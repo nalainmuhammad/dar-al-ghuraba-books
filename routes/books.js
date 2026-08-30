@@ -45,6 +45,7 @@ const bookValidators = [
     .withMessage('Invalid hex color'),
   body('imageUrl').optional().trim(),
   body('inStock').optional().isBoolean(),
+  body('onDemand').optional().isBoolean(),
   body('sortOrder').optional().isInt().toInt(),
 ];
 
@@ -71,6 +72,7 @@ router.get('/', async (req, res, next) => {
     if (language) filter.language = language;
     if (featured === 'true') filter.featured = true;
     if (inStock !== undefined) filter.inStock = inStock === 'true';
+    if (req.query.onDemand !== undefined) filter.onDemand = req.query.onDemand === 'true';
 
     // Text search across title, author, description
     if (search) {
@@ -269,6 +271,7 @@ router.put(
     .withMessage('Invalid hex color'),
   body('imageUrl').optional().trim(),
   body('inStock').optional().isBoolean(),
+  body('onDemand').optional().isBoolean(),
   body('sortOrder').optional().isInt().toInt(),
   validate,
   async (req, res, next) => {

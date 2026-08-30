@@ -829,6 +829,11 @@ body.menu-open .navbar.scrolled {
   letter-spacing: 0.5px;
 }
 
+.book-card-badge-demand {
+  background: #F39C12 !important; /* Vibrant Orange/Amber */
+  color: white !important;
+}
+
 .book-card-body {
   padding: 20px;
   display: flex;

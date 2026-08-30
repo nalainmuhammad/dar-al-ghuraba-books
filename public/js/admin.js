@@ -325,6 +325,9 @@ async function loadStats() {
     document.getElementById('stat-instock').textContent = stats.inStock;
     document.getElementById('stat-outofstock').textContent = stats.outOfStock;
 
+    const onDemandEl = document.getElementById('stat-ondemand');
+    if (onDemandEl) onDemandEl.textContent = stats.onDemandBooks || 0;
+
     const breakdownEl = document.getElementById('categories-breakdown');
     if (breakdownEl && stats.categories.length) {
       const maxCount = Math.max(...stats.categories.map(c => c.count));
@@ -539,6 +542,7 @@ async function loadBooks() {
         <td><strong>Rs. ${parseFloat(book.price).toFixed(2)}</strong></td>
         <td>${book.featured ? '<span class="table-badge table-badge-featured">⭐ Yes</span>' : '—'}</td>
         <td>${book.inStock !== false ? '<span class="table-badge table-badge-in-stock">In Stock</span>' : '<span class="table-badge table-badge-out-of-stock">Out</span>'}</td>
+        <td>${book.onDemand ? '<span class="table-badge" style="background:#F39C12;color:white;">📢 Yes</span>' : '—'}</td>
         <td>${book.sortOrder || 0}</td>
         <td>
           <div class="table-actions">
@@ -619,6 +623,7 @@ async function handleBookSubmit(e) {
     imageUrl: imageUrl,
     featured: document.getElementById('form-book-featured').checked,
     inStock: document.getElementById('form-book-instock').checked,
+    onDemand: document.getElementById('form-book-ondemand')?.checked || false,
     sortOrder: parseInt(document.getElementById('form-book-sortorder').value) || 0,
   };
 
@@ -679,6 +684,10 @@ window.editBook = async (id) => {
     if (fileInput) fileInput.value = '';
     document.getElementById('form-book-featured').checked = book.featured;
     document.getElementById('form-book-instock').checked = book.inStock !== false;
+    
+    const onDemandEl = document.getElementById('form-book-ondemand');
+    if (onDemandEl) onDemandEl.checked = !!book.onDemand;
+
     document.getElementById('form-book-sortorder').value = book.sortOrder || 0;
 
     document.getElementById('form-title').textContent = 'Edit Book';
@@ -696,6 +705,10 @@ function clearBookForm() {
   document.getElementById('form-book-color').value = '#1B6B3A';
   document.getElementById('color-value').textContent = '#1B6B3A';
   document.getElementById('form-book-instock').checked = true;
+  
+  const onDemandEl = document.getElementById('form-book-ondemand');
+  if (onDemandEl) onDemandEl.checked = false;
+
   document.getElementById('form-book-sortorder').value = 0;
   document.getElementById('form-title').textContent = 'Add New Book';
   document.getElementById('submit-btn-text').textContent = 'Add Book';

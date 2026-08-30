@@ -53,6 +53,7 @@ router.get('/stats', async (req, res, next) => {
         featuredBooks,
         inStock: totalBooks - outOfStock,
         outOfStock,
+        onDemandBooks: await Book.countDocuments({ onDemand: true }),
         categories: categoryBreakdown.map((c) => ({
           name: c._id,
           count: c.count,
