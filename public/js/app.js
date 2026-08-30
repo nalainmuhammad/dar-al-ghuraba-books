@@ -176,17 +176,21 @@ function initPageTransition() {
 function initHeroParticles() {
   const container = document.getElementById('hero-particles');
   if (!container) return;
+  // Skip on mobile devices or reduced motion to guarantee 60fps buttery smooth performance
+  if (window.innerWidth < 768 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  for (let i = 0; i < 20; i++) {
+  const fragment = document.createDocumentFragment();
+  for (let i = 0; i < 12; i++) {
     const particle = document.createElement('div');
     particle.className = 'hero-particle';
     particle.style.left = Math.random() * 100 + '%';
-    particle.style.animationDelay = Math.random() * 15 + 's';
-    particle.style.animationDuration = (10 + Math.random() * 10) + 's';
-    particle.style.width = (2 + Math.random() * 4) + 'px';
+    particle.style.animationDelay = Math.random() * 10 + 's';
+    particle.style.animationDuration = (12 + Math.random() * 8) + 's';
+    particle.style.width = (2 + Math.random() * 3) + 'px';
     particle.style.height = particle.style.width;
-    container.appendChild(particle);
+    fragment.appendChild(particle);
   }
+  container.appendChild(fragment);
 }
 
 /* ─── Active Nav Link Highlight ─────────────────────────── */

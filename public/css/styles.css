@@ -371,7 +371,8 @@ body.menu-open .navbar.scrolled {
 .nav-brand img {
   width: 42px;
   height: 42px;
-  border-radius: 8px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .nav-brand-text {
@@ -1984,22 +1985,59 @@ body.menu-open .navbar.scrolled {
     font-size: 1rem;
   }
 
-  /* Hero */
+  /* Hero mobile spacing fix - removes empty gap between navbar and hero */
+  .hero {
+    padding-top: calc(var(--nav-height) + 12px) !important;
+    padding-bottom: 36px !important;
+    min-height: auto;
+  }
+
+  .hero-content {
+    padding: 8px 0 16px 0 !important;
+  }
+
+  .hero-badge {
+    margin-bottom: 14px;
+    padding: 6px 14px;
+    font-size: 0.76rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.15rem;
+    margin-bottom: 10px;
+  }
+
   .hero h1 {
-    font-size: 2rem;
+    font-size: 1.95rem;
+    margin-bottom: 10px;
+  }
+
+  .hero-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 22px;
   }
 
   .hero-stats {
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
+    margin-top: 28px;
+    padding-top: 20px;
   }
 
   .hero-buttons {
     flex-direction: column;
+    gap: 12px;
   }
 
   .hero-buttons .btn {
     width: 100%;
+  }
+
+  /* Disable heavy background particles on mobile for smooth 60fps scrolling */
+  .hero-particles,
+  .login-particles {
+    display: none !important;
   }
 
   /* Grids */

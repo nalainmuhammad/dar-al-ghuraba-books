@@ -146,12 +146,13 @@ function renderCategories() {
     { name: 'Seerah', icon: '🕌', desc: 'Prophetic biography & companions' },
     { name: 'Fiqh', icon: '⚖️', desc: 'Islamic jurisprudence & rulings' },
     { name: 'Aqeedah', icon: '🕋', desc: 'Islamic creed & theology' },
+    { name: 'Matoon', icon: '📑', desc: 'Classical Arabic texts & essential treatises' },
     { name: 'Notebooks', icon: '📓', desc: 'Premium Islamic-themed notebooks & journals' },
     { name: 'Islamic Clothing', icon: '👕', desc: 'Premium Kufis, modest wear & accessories' }
   ];
 
   grid.innerHTML = categoryData.map((cat, i) => `
-    <a href="catalog.html?category=${encodeURIComponent(cat.name)}" class="category-card glass-card reveal reveal-delay-${i + 1}">
+    <a href="catalog.html?category=${encodeURIComponent(cat.name)}" class="category-card glass-card reveal reveal-delay-${(i % 4) + 1}">
       <span class="category-icon">${cat.icon}</span>
       <h3>${cat.name}</h3>
       <p>${cat.desc}</p>
@@ -197,7 +198,19 @@ async function initCatalog() {
   const params = new URLSearchParams(window.location.search);
   const initialCategory = params.get('category');
   if (initialCategory && categoryFilter) {
-    categoryFilter.value = initialCategory;
+    const matchingOpt = Array.from(categoryFilter.options).find(
+      o => o.value.toLowerCase() === initialCategory.toLowerCase()
+    );
+    if (matchingOpt) {
+      categoryFilter.value = matchingOpt.value;
+    } else {
+      // If category not yet in database filter options, append and select it
+      const newOpt = document.createElement('option');
+      newOpt.value = initialCategory;
+      newOpt.textContent = initialCategory;
+      categoryFilter.appendChild(newOpt);
+      categoryFilter.value = initialCategory;
+    }
   }
 
   const ITEMS_PER_PAGE = 12;
@@ -214,7 +227,7 @@ async function initCatalog() {
     const query = searchInput ? searchInput.value.trim() : '';
     if (query) queryParams.search = query;
 
-    const cat = categoryFilter ? categoryFilter.value : '';
+    const cat = categoryFilter ? categoryFilter.value : (initialCategory || '');
     if (cat) queryParams.category = cat;
 
     const auth = authorFilter ? authorFilter.value : '';
