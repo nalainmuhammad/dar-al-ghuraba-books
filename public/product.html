@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO_PLACEHOLDER -->
+
+  <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    /* Product Page Specific Styles */
+    .product-page-hero {
+      padding: calc(var(--nav-height) + 40px) 0 60px;
+      background: var(--bg-primary);
+    }
+
+    .product-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    .product-image-col {
+      position: sticky;
+      top: calc(var(--nav-height) + 40px);
+    }
+
+    .product-image-wrapper {
+      background: var(--bg-secondary);
+      border-radius: var(--card-radius);
+      padding: 40px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .product-image {
+      max-width: 100%;
+      height: auto;
+      max-height: 500px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    
+    .product-image-placeholder {
+       width: 100%;
+       height: 400px;
+       border-radius: 8px;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       justify-content: center;
+       color: white;
+       text-align: center;
+       padding: 20px;
+    }
+
+    .product-badges {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .product-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .badge-featured { background: var(--accent-gold); color: #1A1A1A; }
+    .badge-stock-in { background: #2ECC71; color: white; }
+    .badge-stock-out { background: #E74C3C; color: white; }
+    .badge-category { background: rgba(var(--accent-emerald-rgb), 0.15); color: var(--accent-emerald); }
+
+    .product-details-col {
+      padding-top: 20px;
+    }
+
+    .product-breadcrumb {
+      display: flex;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .product-breadcrumb a { color: var(--accent-emerald); }
+    .product-breadcrumb a:hover { text-decoration: underline; }
+
+    .product-title {
+      font-size: 2.5rem;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .product-author {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .product-price-section {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .product-price {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent-emerald);
+    }
+
+    .product-price .currency {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    .product-actions {
+      display: flex;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .btn-add-cart {
+      flex: 1;
+      padding: 16px 32px;
+      font-size: 1.1rem;
+      border-radius: var(--btn-radius);
+      background: var(--accent-gold);
+      color: #1A1A1A;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-add-cart:hover {
+      background: var(--accent-gold-light);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-glow);
+    }
+    
+    .btn-add-cart:disabled {
+      background: var(--border-subtle);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .product-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 40px;
+      background: var(--bg-secondary);
+      padding: 24px;
+      border-radius: var(--card-radius);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .meta-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .meta-value {
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .product-description h3 {
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+
+    .product-description p {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 992px) {
+      .product-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .product-image-col {
+        position: static;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .product-price-section {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .product-meta-grid {
+        grid-template-columns: 1fr;
+      }
+      .product-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Navigation ──────────────────────────────────────── -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="container">
+      <a href="/index.html" class="nav-brand">
+        <img src="/assets/images/logo.jpg" alt="Dar Al Ghuraba Books Logo" width="42" height="42">
+        <div class="nav-brand-text">
+          <span class="nav-brand-name">Dar Al Ghuraba</span>
+          <span class="nav-brand-tagline">دار الغرباء</span>
+        </div>
+      </a>
+
+      <div class="nav-links" id="nav-links">
+        <a href="/index.html" class="nav-link" data-page="home">Home</a>
+        <a href="/catalog.html" class="nav-link" data-page="catalog">Books</a>
+        <a href="/about.html" class="nav-link" data-page="about">About</a>
+        <a href="/contact.html" class="nav-link" data-page="contact">Contact</a>
+        <a href="/faq.html" class="nav-link" data-page="faq">FAQ</a>
+      </div>
+
+      <div class="nav-actions">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">🌙</button>
+        <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="product-page-hero">
+      <div class="container" id="product-container">
+        <!-- Skeleton Loading State -->
+        <div class="product-container">
+           <div class="product-image-col">
+              <div class="skeleton" style="height: 500px; width: 100%; border-radius: 16px;"></div>
+           </div>
+           <div class="product-details-col">
+              <div class="skeleton" style="height: 20px; width: 200px; margin-bottom: 24px;"></div>
+              <div class="skeleton" style="height: 50px; width: 80%; margin-bottom: 12px;"></div>
+              <div class="skeleton" style="height: 30px; width: 40%; margin-bottom: 40px;"></div>
+              <div class="skeleton" style="height: 60px; width: 100%; margin-bottom: 40px;"></div>
+              <div class="skeleton" style="height: 200px; width: 100%;"></div>
+           </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ─── Footer ──────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/index.html" class="nav-brand">
+            <img src="/assets/images/logo.jpg" alt="Dar Al Ghuraba Books" width="42" height="42">
+            <div class="nav-brand-text">
+              <span class="nav-brand-name" style="color: var(--text-primary);">Dar Al Ghuraba</span>
+              <span class="nav-brand-tagline">دار الغرباء</span>
+            </div>
+          </a>
+          <p>Your trusted Home of the Strangers — providing authentic Islamic literature and clothing to nurture faith and understanding.</p>
+        </div>
+
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/catalog.html">Browse Books</a></li>
+            <li><a href="/about.html">About Us</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+            <li><a href="/faq.html">FAQ</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4>Categories</h4>
+          <ul>
+            <li><a href="/catalog.html?category=Quran">Quran</a></li>
+            <li><a href="/catalog.html?category=Hadith">Hadith</a></li>
+            <li><a href="/catalog.html?category=Seerah">Seerah</a></li>
+            <li><a href="/catalog.html?category=Fiqh">Fiqh</a></li>
+            <li><a href="/catalog.html?category=Aqeedah">Aqeedah</a></li>
+            <li><a href="/catalog.html?category=Notebooks">Notebooks</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="/faq.html">FAQs</a></li>
+            <li><a href="/contact.html">Get in Touch</a></li>
+            <li><a href="#" id="footer-whatsapp">WhatsApp Us</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Dar Al Ghuraba. All rights reserved.</p>
+        <p style="font-family: var(--font-arabic); color: var(--accent-gold);">طلب العلم فريضة — Seeking knowledge is an obligation</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ─── Scripts ─────────────────────────────────────────── -->
+  <!-- JS_PLACEHOLDER -->
+  <script src="/js/cart.js"></script>
+  <script src="/js/components.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/product.js"></script>
+</body>
+</html>

@@ -9,7 +9,12 @@
     "seed": "node scripts/seed.js",
     "create-admin": "node scripts/createAdmin.js"
   },
-  "keywords": ["islamic-books", "bookstore", "express", "mongodb"],
+  "keywords": [
+    "islamic-books",
+    "bookstore",
+    "express",
+    "mongodb"
+  ],
   "author": "Dar-ul-Ilm Books",
   "license": "ISC",
   "dependencies": {
@@ -20,6 +25,7 @@
     "express": "^4.21.0",
     "express-rate-limit": "^7.4.0",
     "express-validator": "^7.2.0",
+    "fs": "^0.0.1-security",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.6.0"
