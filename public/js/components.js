@@ -151,15 +151,13 @@ function renderCategories() {
     { name: 'Islamic Clothing', icon: '👕', desc: 'Premium Kufis, modest wear & accessories' }
   ];
 
-  grid.innerHTML = categoryData.map((cat, i) => `
-    <a href="catalog.html?category=${encodeURIComponent(cat.name)}" class="category-card glass-card reveal reveal-delay-${(i % 4) + 1}">
+  grid.innerHTML = categoryData.map((cat) => `
+    <a href="catalog.html?category=${encodeURIComponent(cat.name)}" class="category-card">
       <span class="category-icon">${cat.icon}</span>
       <h3>${cat.name}</h3>
       <p>${cat.desc}</p>
     </a>
   `).join('');
-
-  initScrollReveal();
 }
 
 /* ─── Catalog Page Logic (Async — API-Driven) ───────────── */
