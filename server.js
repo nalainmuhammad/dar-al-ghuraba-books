@@ -20,6 +20,7 @@ const compression = require('compression');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const fs = require('fs');
 
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
@@ -29,6 +30,9 @@ const bookRoutes = require('./routes/books');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const categoryRoutes = require('./routes/categories');
+
+// Models
+const Book = require('./models/Book');
 
 const app = express();
 app.set('trust proxy', 1); // Trust first proxy (Render load balancer)
@@ -155,7 +159,62 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-/* ─── 9. SPA Fallback — Redirect unknown routes to home ─ */
+/* ─── 9. Product Page SEO (Server-Side Rendered) ──────────── */
+app.get('/book/:slug', async (req, res, next) => {
+  try {
+    const param = req.params.slug;
+    const isMongoId = /^[0-9a-fA-F]{24}$/.test(param);
+    const book = await Book.findOne(isMongoId ? { $or: [{ slug: param }, { _id: param }] } : { slug: param }).lean();
+
+    if (!book) {
+      return res.redirect('/catalog.html');
+    }
+
+    // Read the product.html template
+    const templatePath = path.join(__dirname, 'public', 'product.html');
+    let html = fs.readFileSync(templatePath, 'utf8');
+
+    // Inject SEO Meta Tags
+    const metaTags = `
+      <title>${book.title} — Dar Al Ghuraba Books</title>
+      <meta name="description" content="${book.description.substring(0, 150)}...">
+      <meta property="og:title" content="${book.title} — Dar Al Ghuraba Books">
+      <meta property="og:description" content="${book.description.substring(0, 150)}...">
+      <meta property="og:image" content="${book.imageUrl || 'assets/images/hero-bg.png'}">
+      <meta name="twitter:title" content="${book.title} — Dar Al Ghuraba Books">
+      <meta name="twitter:description" content="${book.description.substring(0, 150)}...">
+      <script type="application/ld+json">
+      {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": "${book.title}",
+        "image": "${book.imageUrl || ''}",
+        "description": "${book.description.substring(0, 150)}...",
+        "sku": "${book._id}",
+        "offers": {
+          "@type": "Offer",
+          "priceCurrency": "PKR",
+          "price": "${book.price}",
+          "availability": "${book.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'}"
+        }
+      }
+      </script>
+    `;
+
+    // Replace a placeholder in the HTML head
+    html = html.replace('<!-- SEO_PLACEHOLDER -->', metaTags);
+    
+    // Inject book id into a global JS variable so the client can fetch it
+    const jsInit = `<script>window.__INITIAL_BOOK_SLUG__ = "${book.slug}";</script>`;
+    html = html.replace('<!-- JS_PLACEHOLDER -->', jsInit);
+
+    res.send(html);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/* ─── 10. SPA Fallback — Redirect unknown routes to home ─ */
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({
@@ -166,10 +225,10 @@ app.get('*', (req, res) => {
   res.redirect('/');
 });
 
-/* ─── 10. Error Handler (must be last middleware) ────────── */
+/* ─── 11. Error Handler (must be last middleware) ────────── */
 app.use(errorHandler);
 
-/* ─── 11. Start Server ──────────────────────────────────── */
+/* ─── 12. Start Server ──────────────────────────────────── */
 const startServer = async () => {
   try {
     // Connect to MongoDB

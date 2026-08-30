@@ -45,6 +45,7 @@ const bookValidators = [
     .withMessage('Invalid hex color'),
   body('imageUrl').optional().trim(),
   body('inStock').optional().isBoolean(),
+  body('sortOrder').optional().isInt().toInt(),
 ];
 
 /* ─── GET /api/books — List, Search, Filter, Sort, Paginate ─ */
@@ -77,7 +78,7 @@ router.get('/', async (req, res, next) => {
     }
 
     // Build sort object
-    let sortObj = { createdAt: -1 }; // default: newest first
+    let sortObj = { sortOrder: 1, createdAt: -1 }; // default: specified order, then newest first
     switch (sort) {
       case 'price-low':
         sortObj = { price: 1 };
@@ -160,6 +161,29 @@ router.get('/filters/options', async (req, res, next) => {
   }
 });
 
+/* ─── GET /api/books/slug/:slug — Single Book by Slug ──────────── */
+router.get(
+  '/slug/:slug',
+  async (req, res, next) => {
+    try {
+      const param = req.params.slug;
+      const isMongoId = /^[0-9a-fA-F]{24}$/.test(param);
+      const book = await Book.findOne(isMongoId ? { $or: [{ slug: param }, { _id: param }] } : { slug: param }).lean();
+
+      if (!book) {
+        return res.status(404).json({
+          success: false,
+          message: 'Book not found',
+        });
+      }
+
+      res.json({ success: true, data: book });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 /* ─── GET /api/books/:id — Single Book ──────────────────── */
 router.get(
   '/:id',
@@ -192,7 +216,27 @@ router.post(
   validate,
   async (req, res, next) => {
     try {
-      const book = await Book.create(req.body);
+      let bookData = { ...req.body };
+      
+      // Generate initial slug
+      let baseSlug = bookData.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with hyphens
+        .replace(/(^-|-$)+/g, ''); // Remove leading/trailing hyphens
+      
+      // Ensure unique slug
+      let slug = baseSlug;
+      let slugExists = await Book.findOne({ slug });
+      let counter = 1;
+      while (slugExists) {
+        slug = `${baseSlug}-${counter}`;
+        slugExists = await Book.findOne({ slug });
+        counter++;
+      }
+      
+      bookData.slug = slug;
+      
+      const book = await Book.create(bookData);
 
       res.status(201).json({
         success: true,
@@ -225,10 +269,31 @@ router.put(
     .withMessage('Invalid hex color'),
   body('imageUrl').optional().trim(),
   body('inStock').optional().isBoolean(),
+  body('sortOrder').optional().isInt().toInt(),
   validate,
   async (req, res, next) => {
     try {
-      const book = await Book.findByIdAndUpdate(req.params.id, req.body, {
+      let updateData = { ...req.body };
+      
+      // If title is being updated, handle slug generation
+      if (updateData.title) {
+         let baseSlug = updateData.title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)+/g, '');
+        
+        let slug = baseSlug;
+        let slugExists = await Book.findOne({ slug, _id: { $ne: req.params.id } });
+        let counter = 1;
+        while (slugExists) {
+          slug = `${baseSlug}-${counter}`;
+          slugExists = await Book.findOne({ slug, _id: { $ne: req.params.id } });
+          counter++;
+        }
+        updateData.slug = slug;
+      }
+      
+      const book = await Book.findByIdAndUpdate(req.params.id, updateData, {
         new: true, // return the updated document
         runValidators: true, // apply schema validation on update
       });

@@ -168,6 +168,7 @@
                 <th>Price (Rs.)</th>
                 <th>Featured</th>
                 <th>Stock</th>
+                <th>Order</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -225,20 +226,24 @@
           </div>
         </div>
 
-        <div class="form-row form-row-3">
-          <div class="form-group">
+        <div class="form-row">
+          <div class="form-group" style="flex: 1;">
             <label for="form-book-price">Price (Rs.) *</label>
             <input type="number" id="form-book-price" required min="0" step="1" placeholder="1500">
           </div>
-          <div class="form-group">
+          <div class="form-group" style="flex: 1;">
+            <label for="form-book-sortorder">Sort Order</label>
+            <input type="number" id="form-book-sortorder" min="0" step="1" placeholder="0">
+          </div>
+          <div class="form-group" style="flex: 2;">
             <label for="form-book-category">Category *</label>
             <select id="form-book-category" required>
               <option value="">Select Category</option>
             </select>
           </div>
-          <div class="form-group">
+          <div class="form-group" style="flex: 1;">
             <label for="form-book-language">Language</label>
-            <input type="text" id="form-book-language" placeholder="e.g. English/Arabic" value="English">
+            <input type="text" id="form-book-language" placeholder="e.g. English" value="English">
           </div>
         </div>
 
