@@ -59,6 +59,7 @@ const bookSchema = new mongoose.Schema(
     slug: {
       type: String,
       unique: true,
+      sparse: true,
     },
     sortOrder: {
       type: Number,
