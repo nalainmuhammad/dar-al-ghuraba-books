@@ -32,6 +32,11 @@ const bookSchema = new mongoose.Schema(
       trim: true,
       default: 'English',
     },
+    format: {
+      type: String,
+      enum: ['Hardcover', 'Softcover'],
+      default: 'Hardcover',
+    },
     description: {
       type: String,
       required: [true, 'Description is required'],

@@ -618,6 +618,7 @@ async function handleBookSubmit(e) {
     price: parseFloat(document.getElementById('form-book-price').value),
     category: document.getElementById('form-book-category').value,
     language: document.getElementById('form-book-language').value.trim() || 'English',
+    format: document.getElementById('form-book-format').value || 'Hardcover',
     description: document.getElementById('form-book-description').value.trim(),
     color: document.getElementById('form-book-color').value,
     imageUrl: imageUrl,
@@ -676,6 +677,7 @@ window.editBook = async (id) => {
     document.getElementById('form-book-price').value = book.price;
     document.getElementById('form-book-category').value = book.category;
     document.getElementById('form-book-language').value = book.language;
+    document.getElementById('form-book-format').value = book.format || 'Hardcover';
     document.getElementById('form-book-description').value = book.description;
     document.getElementById('form-book-color').value = book.color || '#1B6B3A';
     document.getElementById('color-value').textContent = book.color || '#1B6B3A';

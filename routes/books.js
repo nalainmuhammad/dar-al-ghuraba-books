@@ -37,6 +37,7 @@ const bookValidators = [
     .withMessage('Price must be a positive number'),
   body('category').trim().notEmpty().withMessage('Category is required'),
   body('language').optional().trim(),
+  body('format').optional().isIn(['Hardcover', 'Softcover']).withMessage('Invalid format'),
   body('description').trim().notEmpty().withMessage('Description is required'),
   body('featured').optional().isBoolean(),
   body('color')
@@ -263,6 +264,7 @@ router.put(
   body('price').optional().isFloat({ min: 0 }).withMessage('Price must be a positive number'),
   body('category').optional().trim().notEmpty().withMessage('Category cannot be empty'),
   body('language').optional().trim(),
+  body('format').optional().isIn(['Hardcover', 'Softcover']).withMessage('Invalid format'),
   body('description').optional().trim().notEmpty().withMessage('Description cannot be empty'),
   body('featured').optional().isBoolean(),
   body('color')
