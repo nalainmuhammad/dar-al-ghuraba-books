@@ -369,10 +369,12 @@ body.menu-open .navbar.scrolled {
 }
 
 .nav-brand img {
-  width: 42px;
-  height: 42px;
+  width: 58px;
+  height: 58px;
+  margin: -8px;
   border-radius: 50%;
   object-fit: cover;
+  object-position: center;
 }
 
 .nav-brand-text {

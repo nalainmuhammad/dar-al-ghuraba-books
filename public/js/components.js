@@ -160,7 +160,7 @@ function renderCategories() {
     { name: 'Seerah', icon: '🕌', desc: 'Prophetic biography & companions' },
     { name: 'Fiqh', icon: '⚖️', desc: 'Islamic jurisprudence & rulings' },
     { name: 'Aqeedah', icon: '🕋', desc: 'Islamic creed & theology' },
-    { name: 'Matoon', icon: '📑', desc: 'Classical Arabic texts & essential treatises' },
+    { name: 'Mutoon', icon: '📑', desc: 'Classical Arabic texts & essential treatises' },
     { name: 'Notebooks', icon: '📓', desc: 'Premium Islamic-themed notebooks & journals' },
     { name: 'Islamic Clothing', icon: '👕', desc: 'Premium Kufis, modest wear & accessories' }
   ];
