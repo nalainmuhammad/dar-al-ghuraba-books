@@ -730,7 +730,7 @@ body.menu-open .navbar.scrolled {
   border-radius: var(--card-radius);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s cubic-bezier(0.2, 0, 0, 1), border-color 0.25s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
   border: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
@@ -741,22 +741,22 @@ body.menu-open .navbar.scrolled {
 }
 
 .book-card:hover {
-  transform: translateY(-6px) translateZ(0);
-  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-4px) scale(1.01) translateZ(0);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.08);
   border-color: rgba(var(--accent-gold-rgb), 0.4);
 }
 
 .books-grid .book-card {
-  animation: fadeInCard 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInCard 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes fadeInCard {
-  from { opacity: 0; transform: translateY(10px) translateZ(0); }
+  from { opacity: 0; transform: translateY(20px) translateZ(0); }
   to { opacity: 1; transform: translateY(0) translateZ(0); }
 }
 
 .book-card-image {
-  aspect-ratio: 1 / 1.35;
+  aspect-ratio: 1 / 1.1;
   height: auto;
   display: flex;
   align-items: center;
@@ -935,7 +935,7 @@ body.menu-open .navbar.scrolled {
   border: 1px solid var(--border-subtle);
   border-radius: var(--card-radius);
   box-shadow: var(--shadow-sm);
-  transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s cubic-bezier(0.2, 0, 0, 1), border-color 0.25s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
   will-change: transform;
   transform: translateZ(0);
   text-decoration: none;
@@ -945,8 +945,8 @@ body.menu-open .navbar.scrolled {
 }
 
 .category-card:hover {
-  transform: translateY(-5px) translateZ(0);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-4px) scale(1.02) translateZ(0);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.06);
   border-color: rgba(var(--accent-gold-rgb), 0.4);
 }
 
@@ -1551,8 +1551,8 @@ body.menu-open .navbar.scrolled {
 /* ─── Scroll Reveal Animations ──────────────────────────── */
 .reveal {
   opacity: 0;
-  transform: translateY(12px) translateZ(0);
-  transition: opacity 0.35s ease, transform 0.35s ease;
+  transform: translateY(30px) translateZ(0);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
