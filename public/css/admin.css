@@ -53,12 +53,14 @@
 }
 
 .login-logo img {
-  margin-bottom: 16px;
-  border-radius: 50%;
+  width: 94px;
+  height: 94px;
+  margin: 0 auto 16px;
+  margin-top: -19px;
+  margin-bottom: -3px; /* -19px + 16px original bottom margin */
+  clip-path: circle(28px at center);
   object-fit: cover;
   object-position: center;
-  width: 76px;
-  height: 76px;
   filter: drop-shadow(0 4px 12px rgba(201, 151, 58, 0.3));
 }
 
@@ -196,10 +198,10 @@
 }
 
 .sidebar-brand img {
-  width: 50px;
-  height: 50px;
-  margin: -7px;
-  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  margin: -12px;
+  clip-path: circle(18px at center);
   object-fit: cover;
   object-position: center;
 }
