@@ -180,14 +180,18 @@ function initHeroParticles() {
   if (window.innerWidth < 768 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const fragment = document.createDocumentFragment();
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 15; i++) {
     const particle = document.createElement('div');
     particle.className = 'hero-particle';
     particle.style.left = Math.random() * 100 + '%';
-    particle.style.animationDelay = Math.random() * 10 + 's';
-    particle.style.animationDuration = (12 + Math.random() * 8) + 's';
-    particle.style.width = (2 + Math.random() * 3) + 'px';
-    particle.style.height = particle.style.width;
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.animationDelay = (Math.random() * -15) + 's'; // Negative delay so they are already moving
+    particle.style.animationDuration = (15 + Math.random() * 15) + 's';
+    
+    // Random sizes from 10px to 80px to look like bokeh bubbles
+    const size = (10 + Math.random() * 70) + 'px';
+    particle.style.width = size;
+    particle.style.height = size;
     fragment.appendChild(particle);
   }
   container.appendChild(fragment);
