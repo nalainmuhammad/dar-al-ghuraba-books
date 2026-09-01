@@ -45,12 +45,24 @@ function renderProduct(book) {
         <span style="font-size: 1.5rem; font-weight: bold; max-width: 80%;">${book.title}</span>
       </div>`;
       
-  const stockBadge = book.inStock !== false 
-    ? '<span class="product-badge badge-stock-in">In Stock</span>' 
-    : '<span class="product-badge badge-stock-out">Out of Stock</span>';
+  let stockBadge = '';
+  if (book.onDemand) {
+    stockBadge = '<span class="product-badge" style="background:#F39C12;color:white;">On Demand</span>';
+  } else if (book.inStock !== false) {
+    stockBadge = '<span class="product-badge badge-stock-in">In Stock</span>';
+  } else {
+    stockBadge = '<span class="product-badge badge-stock-out">Out of Stock</span>';
+  }
     
-  const cartBtnDisabled = book.inStock === false ? 'disabled' : '';
-  const cartBtnText = book.inStock === false ? 'Out of Stock' : 'Add to Cart';
+  let cartBtnDisabled = '';
+  let cartBtnText = 'Add to Cart';
+  
+  if (book.inStock === false && !book.onDemand) {
+    cartBtnDisabled = 'disabled';
+    cartBtnText = 'Out of Stock';
+  } else if (book.onDemand) {
+    cartBtnText = 'Order on Demand';
+  }
 
   container.innerHTML = `
     <div class="product-container reveal">
@@ -126,8 +138,51 @@ function renderProduct(book) {
 
   // Init scroll reveal
   if (typeof initScrollReveal === 'function') {
-    setTimeout(initScrollReveal, 100);
+    initScrollReveal();
   }
+  
+  injectProductSchema(book);
+}
+
+function injectProductSchema(book) {
+  // Remove existing schema if any
+  const existingSchema = document.getElementById('product-schema');
+  if (existingSchema) existingSchema.remove();
+
+  const schema = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": book.title,
+    "image": book.imageUrl ? [book.imageUrl] : [],
+    "description": book.description || book.title,
+    "sku": book.slug || book._id,
+    "brand": {
+      "@type": "Brand",
+      "name": "Dar Al Ghuraba Books"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": window.location.href,
+      "priceCurrency": "PKR",
+      "price": book.price,
+      "priceValidUntil": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+      "itemCondition": "https://schema.org/NewCondition",
+      "availability": book.inStock !== false ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+    }
+  };
+
+  if (book.author) {
+    schema.author = {
+      "@type": "Person",
+      "name": book.author
+    };
+  }
+
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.id = 'product-schema';
+  script.text = JSON.stringify(schema);
+  document.head.appendChild(script);
 }
 
 function formatDescription(desc) {

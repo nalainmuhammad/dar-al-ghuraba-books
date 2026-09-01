@@ -817,32 +817,41 @@ body.menu-open .navbar.scrolled {
   font-family: var(--font-arabic);
 }
 
-.book-card-badge {
+.badges-container {
   position: absolute;
-  padding: 4px 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.badges-top {
+  top: 12px;
+}
+
+.badges-bottom {
+  bottom: 12px;
+}
+
+.book-card-badge {
+  position: relative;
+  padding: 4px 10px;
   background: var(--accent-gold);
   color: #1A1A1A;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
   border-radius: 20px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  z-index: 2;
+  pointer-events: auto;
+  white-space: nowrap;
 }
 
-.badge-top-left {
-  top: 12px;
-  left: 12px;
-}
-
-.badge-top-right {
-  top: 12px;
-  right: 12px;
-}
-
-.badge-bottom-left {
-  bottom: 12px;
-  left: 12px;
+.badge-featured {
+  background: var(--accent-gold);
 }
 
 .book-card-badge-demand {

@@ -20,26 +20,33 @@ function renderBookCard(book, extraClass = '') {
         <span class="book-cover-author">${book.author}</span>
       </div>`;
 
-  let badgesHtml = '';
+  let topBadges = '';
+  let bottomBadges = '';
+  
+  if (book.onDemand) {
+    topBadges += '<span class="book-card-badge book-card-badge-demand">On Demand</span>';
+  } else if (book.inStock !== false) {
+    topBadges += '<span class="book-card-badge" style="background: #2ECC71; color: white;">In Stock</span>';
+  } else {
+    topBadges += '<span class="book-card-badge" style="background: #E74C3C; color: white;">Out of Stock</span>';
+  }
   
   if (book.featured) {
-    badgesHtml += '<span class="book-card-badge badge-top-right">Featured</span>';
+    topBadges += '<span class="book-card-badge badge-featured">Featured</span>';
   }
-  if (book.onDemand) {
-    badgesHtml += '<span class="book-card-badge badge-bottom-left book-card-badge-demand">On Demand</span>';
-  }
-  if (book.inStock !== false) {
-    badgesHtml += '<span class="book-card-badge badge-top-left" style="background: #2ECC71; color: white;">In Stock</span>';
-  } else {
-    badgesHtml += '<span class="book-card-badge badge-top-left" style="background: #E74C3C; color: white;">Out of Stock</span>';
-  }
+
+  let badgesHtml = '';
+  if (topBadges) badgesHtml += `<div class="badges-container badges-top">${topBadges}</div>`;
+  if (bottomBadges) badgesHtml += `<div class="badges-container badges-bottom">${bottomBadges}</div>`;
 
   let cartBtnDisabled = '';
   let cartBtnText = 'Add to Cart';
   
-  if (book.inStock === false) {
+  if (book.inStock === false && !book.onDemand) {
     cartBtnDisabled = 'disabled';
     cartBtnText = 'Out of Stock';
+  } else if (book.onDemand) {
+    cartBtnText = 'Order on Demand';
   }
 
   return `
