@@ -621,37 +621,76 @@ body.menu-open .navbar.scrolled {
   margin-top: 4px;
 }
 
-/* Animated particles behind hero */
+/* ─── Hero Animated Glowing Bubbles ────────────────────── */
 .hero-particles {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   overflow: hidden;
+  pointer-events: none;
+  contain: strict;
 }
 
-.hero-particle {
+.hero-bubble {
   position: absolute;
   border-radius: 50%;
-  background: rgba(201, 151, 58, 0.12);
   pointer-events: none;
-  opacity: 0;
-  animation: float-up linear infinite;
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
 }
 
-@keyframes float-up {
+.hero-bubble-gold {
+  background: radial-gradient(circle at 35% 35%, rgba(245, 217, 138, 0.7) 0%, rgba(201, 151, 58, 0.38) 40%, rgba(201, 151, 58, 0.08) 70%, transparent 100%);
+  box-shadow: 0 0 25px rgba(201, 151, 58, 0.25);
+}
+
+.hero-bubble-emerald {
+  background: radial-gradient(circle at 35% 35%, rgba(88, 214, 141, 0.6) 0%, rgba(46, 204, 113, 0.32) 40%, rgba(27, 107, 58, 0.08) 70%, transparent 100%);
+  box-shadow: 0 0 25px rgba(46, 204, 113, 0.2);
+}
+
+@keyframes bubble-float-1 {
   0% {
-    opacity: 0;
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.45;
   }
-  15% {
-    opacity: 0.5;
-  }
-  85% {
-    opacity: 0.5;
+  50% {
+    transform: translate3d(28px, -45px, 0) scale(1.15);
+    opacity: 0.85;
   }
   100% {
-    opacity: 0;
-    transform: translateY(-80vh) scale(0.6);
+    transform: translate3d(-20px, -80px, 0) scale(0.92);
+    opacity: 0.5;
+  }
+}
+
+@keyframes bubble-float-2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.95);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate3d(-35px, -55px, 0) scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate3d(25px, -95px, 0) scale(1.02);
+    opacity: 0.45;
+  }
+}
+
+@keyframes bubble-float-3 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1.05);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate3d(30px, -65px, 0) scale(0.88);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate3d(-30px, -115px, 0) scale(1.12);
+    opacity: 0.4;
   }
 }
 

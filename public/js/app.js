@@ -172,40 +172,48 @@ function initPageTransition() {
   }
 }
 
-/* ─── Hero Particles ────────────────────────────────────── */
+/* ─── Hero Particles / Bubbles ─────────────────────────── */
 function initHeroParticles() {
   const container = document.getElementById('hero-particles');
   if (!container) return;
+  container.innerHTML = '';
 
-  // Fewer particles on mobile for smooth performance
   const isMobile = window.innerWidth < 768;
-  const count = isMobile ? 8 : 12;
 
+  // Pre-configured organic coordinates and paths matching the hero background layout
+  const bubbleConfigs = [
+    { left: '8%', top: '20%', size: 55, type: 'gold', anim: 'bubble-float-1', dur: 9, delay: -2 },
+    { left: '16%', top: '68%', size: 36, type: 'emerald', anim: 'bubble-float-2', dur: 12, delay: -5 },
+    { left: '76%', top: '14%', size: 75, type: 'gold', anim: 'bubble-float-3', dur: 10, delay: -3 },
+    { left: '88%', top: '42%', size: 45, type: 'emerald', anim: 'bubble-float-1', dur: 13, delay: -7 },
+    { left: '68%', top: '68%', size: 85, type: 'gold', anim: 'bubble-float-2', dur: 11, delay: -1 },
+    { left: '84%', top: '78%', size: 40, type: 'gold', anim: 'bubble-float-3', dur: 14, delay: -8 },
+    { left: '46%', top: '10%', size: 48, type: 'emerald', anim: 'bubble-float-1', dur: 15, delay: -4 },
+    { left: '26%', top: '38%', size: 32, type: 'gold', anim: 'bubble-float-2', dur: 10, delay: -6 },
+    { left: '92%', top: '20%', size: 60, type: 'gold', anim: 'bubble-float-3', dur: 12, delay: -9 },
+    { left: '58%', top: '38%', size: 42, type: 'emerald', anim: 'bubble-float-1', dur: 11, delay: -3 },
+    { left: '10%', top: '82%', size: 62, type: 'gold', anim: 'bubble-float-2', dur: 14, delay: -5 },
+    { left: '72%', top: '26%', size: 34, type: 'gold', anim: 'bubble-float-3', dur: 9, delay: -2 }
+  ];
+
+  const activeConfigs = isMobile ? bubbleConfigs.slice(0, 7) : bubbleConfigs;
   const fragment = document.createDocumentFragment();
-  for (let i = 0; i < count; i++) {
-    const particle = document.createElement('div');
-    particle.className = 'hero-particle';
 
-    // Random horizontal position
-    particle.style.left = Math.random() * 100 + '%';
-    // Start from bottom half so they float upward visibly
-    particle.style.bottom = -(Math.random() * 20) + '%';
+  activeConfigs.forEach((cfg) => {
+    const bubble = document.createElement('div');
+    bubble.className = `hero-bubble hero-bubble-${cfg.type}`;
+    const scale = isMobile ? 0.75 : 1;
+    const finalSize = Math.round(cfg.size * scale);
 
-    // Smaller sizes on mobile for performance
-    const size = isMobile
-      ? (8 + Math.random() * 30) + 'px'
-      : (12 + Math.random() * 50) + 'px';
-    particle.style.width = size;
-    particle.style.height = size;
+    bubble.style.left = cfg.left;
+    bubble.style.top = cfg.top;
+    bubble.style.width = finalSize + 'px';
+    bubble.style.height = finalSize + 'px';
+    bubble.style.animation = `${cfg.anim} ${cfg.dur}s ease-in-out ${cfg.delay}s infinite alternate`;
 
-    // Each particle gets its own duration and a negative delay
-    // so they start at different points in the animation cycle
-    const duration = 12 + Math.random() * 18;
-    const delay = -(Math.random() * duration);
-    particle.style.animation = 'float-up ' + duration + 's linear ' + delay + 's infinite';
+    fragment.appendChild(bubble);
+  });
 
-    fragment.appendChild(particle);
-  }
   container.appendChild(fragment);
 }
 
