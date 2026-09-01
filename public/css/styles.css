@@ -632,19 +632,27 @@ body.menu-open .navbar.scrolled {
 .hero-particle {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(201, 151, 58, 0.15) 0%, rgba(201, 151, 58, 0.05) 50%, transparent 80%);
-  box-shadow: 0 0 20px rgba(201, 151, 58, 0.1);
-  animation: float-particle 15s ease-in-out infinite alternate;
-  will-change: transform, opacity;
+  background: rgba(201, 151, 58, 0.12);
   pointer-events: none;
-  filter: blur(2px);
+  opacity: 0;
+  animation: float-up linear infinite;
 }
 
-@keyframes float-particle {
-  0% { transform: translateY(20vh) scale(0.8); opacity: 0; }
-  20% { opacity: 0.6; }
-  80% { opacity: 0.6; }
-  100% { transform: translateY(-40vh) scale(1.2); opacity: 0; }
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(1);
+  }
+  15% {
+    opacity: 0.5;
+  }
+  85% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80vh) scale(0.6);
+  }
 }
 
 /* ─── Featured Books Carousel ───────────────────────────── */

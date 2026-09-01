@@ -176,22 +176,34 @@ function initPageTransition() {
 function initHeroParticles() {
   const container = document.getElementById('hero-particles');
   if (!container) return;
-  // We removed the mobile skip because the user requested the animation on all devices.
-  // CSS will-change and transform ensure it runs at 60fps without lag.
+
+  // Fewer particles on mobile for smooth performance
+  const isMobile = window.innerWidth < 768;
+  const count = isMobile ? 8 : 12;
 
   const fragment = document.createDocumentFragment();
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < count; i++) {
     const particle = document.createElement('div');
     particle.className = 'hero-particle';
+
+    // Random horizontal position
     particle.style.left = Math.random() * 100 + '%';
-    particle.style.top = Math.random() * 100 + '%';
-    particle.style.animationDelay = (Math.random() * -15) + 's'; // Negative delay so they are already moving
-    particle.style.animationDuration = (15 + Math.random() * 15) + 's';
-    
-    // Random sizes from 10px to 80px to look like bokeh bubbles
-    const size = (10 + Math.random() * 70) + 'px';
+    // Start from bottom half so they float upward visibly
+    particle.style.bottom = -(Math.random() * 20) + '%';
+
+    // Smaller sizes on mobile for performance
+    const size = isMobile
+      ? (8 + Math.random() * 30) + 'px'
+      : (12 + Math.random() * 50) + 'px';
     particle.style.width = size;
     particle.style.height = size;
+
+    // Each particle gets its own duration and a negative delay
+    // so they start at different points in the animation cycle
+    const duration = 12 + Math.random() * 18;
+    const delay = -(Math.random() * duration);
+    particle.style.animation = 'float-up ' + duration + 's linear ' + delay + 's infinite';
+
     fragment.appendChild(particle);
   }
   container.appendChild(fragment);
