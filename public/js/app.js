@@ -176,8 +176,8 @@ function initPageTransition() {
 function initHeroParticles() {
   const container = document.getElementById('hero-particles');
   if (!container) return;
-  // Skip on mobile devices or reduced motion to guarantee 60fps buttery smooth performance
-  if (window.innerWidth < 768 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // We removed the mobile skip because the user requested the animation on all devices.
+  // CSS will-change and transform ensure it runs at 60fps without lag.
 
   const fragment = document.createDocumentFragment();
   for (let i = 0; i < 15; i++) {
