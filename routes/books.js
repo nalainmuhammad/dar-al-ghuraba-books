@@ -130,6 +130,13 @@ router.get('/', async (req, res, next) => {
       Book.countDocuments(filter),
     ]);
 
+    // Keep large base64 images out of list responses. They are fetched lazily per card.
+    books.forEach((book) => {
+      if (typeof book.imageUrl === 'string' && book.imageUrl.startsWith('data:')) {
+        book.imageUrl = `/api/books/${book._id}/image`;
+      }
+    });
+
     res.json({
       success: true,
       data: books,
@@ -142,6 +149,27 @@ router.get('/', async (req, res, next) => {
         hasPrevPage: pageNum > 1,
       },
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/* ─── GET /api/books/:id/image — Serve stored book image ─── */
+router.get('/:id/image', async (req, res, next) => {
+  try {
+    const book = await Book.findById(req.params.id).select('imageUrl').lean();
+    if (!book || !book.imageUrl) return res.sendStatus(404);
+
+    if (!book.imageUrl.startsWith('data:')) {
+      return res.redirect(book.imageUrl);
+    }
+
+    const match = book.imageUrl.match(/^data:(image\/[\w.+-]+);base64,(.+)$/);
+    if (!match) return res.sendStatus(415);
+
+    res.type(match[1]);
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.send(Buffer.from(match[2], 'base64'));
   } catch (error) {
     next(error);
   }
