@@ -121,7 +121,12 @@ router.get('/', async (req, res, next) => {
     }
 
     const [books, total] = await Promise.all([
-      queryBuilder.sort(sortObj).skip(skip).limit(limitNum).lean(),
+      queryBuilder
+        .sort(sortObj)
+        .allowDiskUse(true)
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
       Book.countDocuments(filter),
     ]);
 

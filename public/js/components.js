@@ -24,11 +24,11 @@ function renderBookCard(book, extraClass = '') {
   let bottomBadges = '';
   
   if (book.onDemand) {
-    topBadges += '<span class="book-card-badge book-card-badge-demand">On Demand</span>';
+    bottomBadges += '<span class="book-card-badge book-card-badge-demand">On Demand</span>';
   } else if (book.inStock !== false) {
-    topBadges += '<span class="book-card-badge" style="background: #2ECC71; color: white;">In Stock</span>';
+    bottomBadges += '<span class="book-card-badge book-card-badge-stock">In Stock</span>';
   } else {
-    topBadges += '<span class="book-card-badge" style="background: #E74C3C; color: white;">Out of Stock</span>';
+    bottomBadges += '<span class="book-card-badge book-card-badge-out">Out of Stock</span>';
   }
   
   if (book.featured) {

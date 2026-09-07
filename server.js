@@ -1,5 +1,3 @@
-const dns = require('dns');
-dns.setServers(['8.8.8.8', '8.8.4.4']);
 /* ============================================================
    Dar Al Ghuraba Books — Express Server Entry Point
    ============================================================
@@ -159,6 +157,28 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+/* ─── Sitemap ───────────────────────────────────────────── */
+app.get('/sitemap.xml', async (req, res, next) => {
+  try {
+    const siteUrl = (process.env.PUBLIC_SITE_URL || 'https://daralghuraba.com').replace(/\/$/, '');
+    const books = await Book.find({ slug: { $exists: true, $ne: '' } }).select('slug updatedAt').lean();
+    const urls = [
+      `${siteUrl}/`,
+      `${siteUrl}/catalog.html`,
+      `${siteUrl}/about.html`,
+      `${siteUrl}/contact.html`,
+      `${siteUrl}/faq.html`,
+      ...books.map((book) => `${siteUrl}/book/${encodeURIComponent(book.slug)}`),
+    ];
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls
+      .map((url) => `<url><loc>${url}</loc></url>`)
+      .join('')}</urlset>`;
+    res.type('application/xml').send(xml);
+  } catch (error) {
+    next(error);
+  }
+});
+
 /* ─── 9. Product Page SEO (Server-Side Rendered) ──────────── */
 app.get('/book/:slug', async (req, res, next) => {
   try {
@@ -174,31 +194,40 @@ app.get('/book/:slug', async (req, res, next) => {
     const templatePath = path.join(__dirname, 'public', 'product.html');
     let html = fs.readFileSync(templatePath, 'utf8');
 
+    const siteUrl = (process.env.PUBLIC_SITE_URL || 'https://daralghuraba.com').replace(/\/$/, '');
+    const canonicalUrl = `${siteUrl}/book/${encodeURIComponent(book.slug || book._id)}`;
+    const productSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: book.title,
+      image: book.imageUrl ? [book.imageUrl] : [],
+      description: `${book.description.substring(0, 150)}...`,
+      sku: String(book._id),
+      brand: { '@type': 'Brand', name: 'Dar Al Ghuraba Books' },
+      offers: {
+        '@type': 'Offer',
+        url: canonicalUrl,
+        priceCurrency: 'PKR',
+        price: Number(book.price),
+        availability: book.onDemand
+          ? 'https://schema.org/PreOrder'
+          : book.inStock !== false
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock',
+      },
+    };
+
     // Inject SEO Meta Tags
     const metaTags = `
       <title>${book.title} — Dar Al Ghuraba Books</title>
+      <link rel="canonical" href="${canonicalUrl}">
       <meta name="description" content="${book.description.substring(0, 150)}...">
       <meta property="og:title" content="${book.title} — Dar Al Ghuraba Books">
       <meta property="og:description" content="${book.description.substring(0, 150)}...">
       <meta property="og:image" content="${book.imageUrl || 'assets/images/hero-bg.png'}">
       <meta name="twitter:title" content="${book.title} — Dar Al Ghuraba Books">
       <meta name="twitter:description" content="${book.description.substring(0, 150)}...">
-      <script type="application/ld+json">
-      {
-        "@context": "https://schema.org/",
-        "@type": "Product",
-        "name": "${book.title}",
-        "image": "${book.imageUrl || ''}",
-        "description": "${book.description.substring(0, 150)}...",
-        "sku": "${book._id}",
-        "offers": {
-          "@type": "Offer",
-          "priceCurrency": "PKR",
-          "price": "${book.price}",
-          "availability": "${book.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'}"
-        }
-      }
-      </script>
+      <script type="application/ld+json">${JSON.stringify(productSchema)}</script>
     `;
 
     // Replace a placeholder in the HTML head

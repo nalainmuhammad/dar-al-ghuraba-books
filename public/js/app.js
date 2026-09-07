@@ -202,7 +202,7 @@ function initHeroParticles() {
   activeConfigs.forEach((cfg) => {
     const bubble = document.createElement('div');
     bubble.className = `hero-bubble hero-bubble-${cfg.type}`;
-    const scale = isMobile ? 0.75 : 1;
+    const scale = isMobile ? 0.55 : 0.68;
     const finalSize = Math.round(cfg.size * scale);
 
     bubble.style.left = cfg.left;

@@ -109,5 +109,6 @@ bookSchema.index({ featured: 1 });
 bookSchema.index({ category: 1, language: 1 });
 bookSchema.index({ price: 1 });
 bookSchema.index({ sortOrder: 1 });
+bookSchema.index({ sortOrder: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Book', bookSchema);

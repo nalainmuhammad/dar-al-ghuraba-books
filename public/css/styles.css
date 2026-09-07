@@ -883,6 +883,7 @@ body.menu-open .navbar.scrolled {
 
 .badges-bottom {
   bottom: 12px;
+  right: auto;
 }
 
 .book-card-badge {
@@ -906,6 +907,16 @@ body.menu-open .navbar.scrolled {
 .book-card-badge-demand {
   background: #F39C12 !important; /* Vibrant Orange/Amber */
   color: white !important;
+}
+
+.book-card-badge-stock {
+  background: #2ECC71;
+  color: white;
+}
+
+.book-card-badge-out {
+  background: #E74C3C;
+  color: white;
 }
 
 .book-card-body {
