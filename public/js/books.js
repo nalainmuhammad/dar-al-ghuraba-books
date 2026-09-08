@@ -27,14 +27,6 @@ async function loadConfig() {
 // Load config on page load
 loadConfig();
 
-/* ─── Helper: Build WhatsApp order URL ─────────────────── */
-function getWhatsAppURL(bookTitle) {
-  const message = encodeURIComponent(
-    `Assalamu Alaikum, I would like to order the following book from Dar Al Ghuraba Books: ${bookTitle}`
-  );
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
-}
-
 /* ─── Fetch Books from API ──────────────────────────────── */
 async function fetchBooks(params = {}) {
   try {
@@ -53,16 +45,61 @@ async function fetchBooks(params = {}) {
 
     const url = `${API_BASE}/books${query.toString() ? '?' + query.toString() : ''}`;
     const res = await fetch(url);
+
+    // Differentiate explicit HTTP error conditions
+    if (res.status === 429) {
+      return {
+        success: false,
+        status: 429,
+        errorType: 'RATE_LIMITED',
+        message: 'Server is busy. Please wait a moment and retry.',
+        data: [],
+        pagination: { totalBooks: 0, totalPages: 0, currentPage: 1 },
+      };
+    }
+
+    if (!res.ok) {
+      let errMsg = 'Failed to fetch books';
+      try {
+        const errJson = await res.json();
+        if (errJson && errJson.message) errMsg = errJson.message;
+      } catch {
+        // May receive HTML error page from reverse proxy
+      }
+      return {
+        success: false,
+        status: res.status,
+        errorType: res.status >= 500 ? 'SERVER_ERROR' : 'HTTP_ERROR',
+        message: errMsg,
+        data: [],
+        pagination: { totalBooks: 0, totalPages: 0, currentPage: 1 },
+      };
+    }
+
     const data = await res.json();
 
     if (!data.success) {
-      throw new Error(data.message || 'Failed to fetch books');
+      return {
+        success: false,
+        status: res.status,
+        errorType: 'API_ERROR',
+        message: data.message || 'Failed to fetch books',
+        data: [],
+        pagination: { totalBooks: 0, totalPages: 0, currentPage: 1 },
+      };
     }
 
     return data;
   } catch (error) {
     console.error('Error fetching books:', error);
-    return { success: false, data: [], pagination: { totalBooks: 0, totalPages: 0, currentPage: 1 } };
+    return {
+      success: false,
+      status: 0,
+      errorType: 'NETWORK_ERROR',
+      message: 'Network connection issue. Please check your connection and retry.',
+      data: [],
+      pagination: { totalBooks: 0, totalPages: 0, currentPage: 1 },
+    };
   }
 }
 
@@ -91,18 +128,4 @@ async function getFilterOptions() {
   return { categories: [], authors: [], languages: [] };
 }
 
-/* ─── Convenience wrappers (match old function signatures) ─ */
-async function getCategories() {
-  const options = await getFilterOptions();
-  return options.categories;
-}
 
-async function getAuthors() {
-  const options = await getFilterOptions();
-  return options.authors;
-}
-
-async function getLanguages() {
-  const options = await getFilterOptions();
-  return options.languages;
-}

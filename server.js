@@ -89,40 +89,75 @@ app.use(
 );
 
 /* ─── 5. Rate Limiting ──────────────────────────────────── */
-// Global rate limiter
+const jwt = require('jsonwebtoken');
+
+// Lightweight in-memory check to identify authenticated admin requests
+const isAdminRequest = (req) => {
+  const auth = req.headers.authorization;
+  if (auth && auth.startsWith('Bearer ')) {
+    try {
+      const token = auth.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      return Boolean(decoded && decoded.id);
+    } catch {
+      return false;
+    }
+  }
+  return false;
+};
+
+// Global rate limiter (public browsing, 500 requests per 15 min; admins bypassed)
 const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // 200 requests per window
+  windowMs: 15 * 60 * 1000,
+  max: 500,
+  skip: (req) => isAdminRequest(req),
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     success: false,
-    message: 'Too many requests. Please try again in 15 minutes.',
+    status: 429,
+    message: 'Too many requests. Please try again in a few minutes.',
   },
 });
 app.use(globalLimiter);
 
-// Stricter limiter for API routes
-const apiLimiter = rateLimit({
+// Public API rate limiter (300 requests per 15 min; admins bypassed)
+const publicApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 300,
+  skip: (req) => isAdminRequest(req),
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     success: false,
-    message: 'Too many API requests. Please slow down.',
+    status: 429,
+    message: 'Too many API requests. Please slow down and try again shortly.',
   },
 });
 
-// Very strict limiter for auth routes (prevents brute-force)
-const authLimiter = rateLimit({
+// Admin rate limiter (5,000 requests per 15 min window to support batch edits/uploads/reordering)
+const adminLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10, // only 10 login attempts per 15 min
+  max: 5000,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     success: false,
-    message: 'Too many login attempts. Please try again later.',
+    status: 429,
+    message: 'Admin request threshold reached. Please wait a moment before continuing.',
+  },
+});
+
+// Dedicated login rate limiter to prevent brute-force attacks on credentials
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15, // 15 login attempts per 15 min
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    status: 429,
+    message: 'Too many login attempts. Please try again in 15 minutes.',
   },
 });
 
@@ -131,10 +166,12 @@ app.use(express.json({ limit: '50mb' })); // allow larger payloads for base64 im
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 /* ─── 7. API Routes ─────────────────────────────────────── */
-app.use('/api/books', apiLimiter, bookRoutes);
-app.use('/api/auth', authLimiter, authRoutes);
-app.use('/api/admin', apiLimiter, adminRoutes);
-app.use('/api/categories', apiLimiter, categoryRoutes);
+// Note: bookRoutes, adminRoutes, categoryRoutes, authRoutes handle specific sub-limits
+app.use('/api/books', publicApiLimiter, bookRoutes);
+app.use('/api/auth/login', loginLimiter);
+app.use('/api/auth', publicApiLimiter, authRoutes);
+app.use('/api/admin', adminLimiter, adminRoutes);
+app.use('/api/categories', publicApiLimiter, categoryRoutes);
 
 // Config endpoint (serves WhatsApp number to frontend)
 app.get('/api/config', (req, res) => {
@@ -187,7 +224,16 @@ app.get('/book/:slug', async (req, res, next) => {
     const book = await Book.findOne(isMongoId ? { $or: [{ slug: param }, { _id: param }] } : { slug: param }).lean();
 
     if (!book) {
-      return res.redirect('/catalog.html');
+      const templatePath = path.join(__dirname, 'public', 'product.html');
+      let html = fs.readFileSync(templatePath, 'utf8');
+      const metaTags = `
+        <title>Book Not Found — Dar Al Ghuraba Books</title>
+        <meta name="robots" content="noindex">
+      `;
+      html = html.replace('<!-- SEO_PLACEHOLDER -->', metaTags);
+      const jsInit = `<script>window.__INITIAL_BOOK_NOT_FOUND__ = true; window.__INITIAL_BOOK_SLUG__ = "${encodeURIComponent(param)}";</script>`;
+      html = html.replace('<!-- JS_PLACEHOLDER -->', jsInit);
+      return res.status(404).send(html);
     }
 
     // Read the product.html template
@@ -201,7 +247,7 @@ app.get('/book/:slug', async (req, res, next) => {
       '@type': 'Product',
       name: book.title,
       image: book.imageUrl ? [book.imageUrl] : [],
-      description: `${book.description.substring(0, 150)}...`,
+      description: `${(book.description || '').substring(0, 150)}...`,
       sku: String(book._id),
       brand: { '@type': 'Brand', name: 'Dar Al Ghuraba Books' },
       offers: {
@@ -221,24 +267,36 @@ app.get('/book/:slug', async (req, res, next) => {
     const metaTags = `
       <title>${book.title} — Dar Al Ghuraba Books</title>
       <link rel="canonical" href="${canonicalUrl}">
-      <meta name="description" content="${book.description.substring(0, 150)}...">
+      <meta name="description" content="${(book.description || '').substring(0, 150)}...">
       <meta property="og:title" content="${book.title} — Dar Al Ghuraba Books">
-      <meta property="og:description" content="${book.description.substring(0, 150)}...">
+      <meta property="og:description" content="${(book.description || '').substring(0, 150)}...">
       <meta property="og:image" content="${book.imageUrl || 'assets/images/hero-bg.png'}">
       <meta name="twitter:title" content="${book.title} — Dar Al Ghuraba Books">
-      <meta name="twitter:description" content="${book.description.substring(0, 150)}...">
+      <meta name="twitter:description" content="${(book.description || '').substring(0, 150)}...">
       <script type="application/ld+json">${JSON.stringify(productSchema)}</script>
     `;
 
     // Replace a placeholder in the HTML head
     html = html.replace('<!-- SEO_PLACEHOLDER -->', metaTags);
     
-    // Inject book id into a global JS variable so the client can fetch it
-    const jsInit = `<script>window.__INITIAL_BOOK_SLUG__ = "${book.slug}";</script>`;
+    // Inject book id and data into a global JS variable so the client can use it immediately
+    const jsInit = `<script>window.__INITIAL_BOOK_SLUG__ = "${book.slug || book._id}";</script>`;
     html = html.replace('<!-- JS_PLACEHOLDER -->', jsInit);
 
+    // Set cache headers for SSR product pages
+    res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=600');
     res.send(html);
   } catch (error) {
+    console.error('Error rendering product page:', error.message);
+    const templatePath = path.join(__dirname, 'public', 'product.html');
+    if (fs.existsSync(templatePath)) {
+      let html = fs.readFileSync(templatePath, 'utf8');
+      const metaTags = `<title>Server Temporarily Busy — Dar Al Ghuraba Books</title>`;
+      html = html.replace('<!-- SEO_PLACEHOLDER -->', metaTags);
+      const jsInit = `<script>window.__INITIAL_SERVER_ERROR__ = true; window.__INITIAL_BOOK_SLUG__ = "${encodeURIComponent(req.params.slug || '')}";</script>`;
+      html = html.replace('<!-- JS_PLACEHOLDER -->', jsInit);
+      return res.status(503).send(html);
+    }
     next(error);
   }
 });

@@ -137,6 +137,7 @@ router.get('/', async (req, res, next) => {
       }
     });
 
+    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
     res.json({
       success: true,
       data: books,
@@ -184,6 +185,7 @@ router.get('/filters/options', async (req, res, next) => {
       Book.distinct('language'),
     ]);
 
+    res.set('Cache-Control', 'public, max-age=600, stale-while-revalidate=1200');
     res.json({
       success: true,
       data: {
@@ -213,6 +215,7 @@ router.get(
         });
       }
 
+      res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=600');
       res.json({ success: true, data: book });
     } catch (error) {
       next(error);
@@ -236,7 +239,40 @@ router.get(
         });
       }
 
+      res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=600');
       res.json({ success: true, data: book });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+/* ─── PATCH /api/books/reorder — Bulk Reorder Books (Admin Only) ─── */
+router.patch(
+  '/reorder',
+  protect,
+  adminOnly,
+  body('items').isArray({ min: 1 }).withMessage('Items array is required'),
+  body('items.*.id').isMongoId().withMessage('Each item must have a valid book id'),
+  body('items.*.sortOrder').isInt().withMessage('Each item must have an integer sortOrder'),
+  validate,
+  async (req, res, next) => {
+    try {
+      const { items } = req.body;
+      const bulkOps = items.map((item) => ({
+        updateOne: {
+          filter: { _id: item.id },
+          update: { $set: { sortOrder: parseInt(item.sortOrder, 10) } },
+        },
+      }));
+
+      await Book.bulkWrite(bulkOps);
+
+      res.set('Cache-Control', 'no-store');
+      res.json({
+        success: true,
+        message: `Successfully reordered ${items.length} books`,
+      });
     } catch (error) {
       next(error);
     }
@@ -274,6 +310,7 @@ router.post(
       
       const book = await Book.create(bookData);
 
+      res.set('Cache-Control', 'no-store');
       res.status(201).json({
         success: true,
         message: 'Book created successfully',
@@ -285,13 +322,103 @@ router.post(
   }
 );
 
-/* ─── PUT /api/books/:id — Update Book (Admin Only) ─────── */
-router.put(
-  '/:id',
-  protect,
-  adminOnly,
+/* ─── Reusable Book Update Handler (Atomic $set & Image Preservation) ─── */
+const updateBookHandler = async (req, res, next) => {
+  try {
+    const allowedFields = [
+      'title',
+      'author',
+      'price',
+      'category',
+      'language',
+      'format',
+      'description',
+      'featured',
+      'color',
+      'imageUrl',
+      'inStock',
+      'onDemand',
+      'sortOrder',
+    ];
+
+    const cleanUpdates = {};
+
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        if (field === 'imageUrl') {
+          // Prevent accidental image wipeout on partial edits:
+          // Only update imageUrl if non-empty string or explicit removeImage flag is set
+          if (typeof req.body.imageUrl === 'string' && req.body.imageUrl.trim() !== '') {
+            cleanUpdates.imageUrl = req.body.imageUrl.trim();
+          } else if (req.body.removeImage === true) {
+            cleanUpdates.imageUrl = '';
+          }
+        } else if (field === 'price') {
+          cleanUpdates.price = Number(req.body.price);
+        } else if (field === 'sortOrder') {
+          cleanUpdates.sortOrder = parseInt(req.body.sortOrder, 10);
+        } else if (field === 'featured') {
+          cleanUpdates.featured = Boolean(req.body.featured);
+        } else if (field === 'inStock') {
+          cleanUpdates.inStock = Boolean(req.body.inStock);
+        } else if (field === 'onDemand') {
+          cleanUpdates.onDemand = Boolean(req.body.onDemand);
+        } else if (typeof req.body[field] === 'string') {
+          cleanUpdates[field] = req.body[field].trim();
+        } else {
+          cleanUpdates[field] = req.body[field];
+        }
+      }
+    }
+
+    // If title is being updated, handle slug generation
+    if (cleanUpdates.title) {
+      let baseSlug = cleanUpdates.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+      
+      let slug = baseSlug;
+      let slugExists = await Book.findOne({ slug, _id: { $ne: req.params.id } });
+      let counter = 1;
+      while (slugExists) {
+        slug = `${baseSlug}-${counter}`;
+        slugExists = await Book.findOne({ slug, _id: { $ne: req.params.id } });
+        counter++;
+      }
+      cleanUpdates.slug = slug;
+    }
+    
+    // Use atomic $set operator to ensure existing unspecified fields are NEVER wiped out
+    const book = await Book.findByIdAndUpdate(
+      req.params.id,
+      { $set: cleanUpdates },
+      {
+        new: true, // return the updated document
+        runValidators: true, // apply schema validation on update
+      }
+    );
+
+    if (!book) {
+      return res.status(404).json({
+        success: false,
+        message: 'Book not found',
+      });
+    }
+
+    res.set('Cache-Control', 'no-store');
+    res.json({
+      success: true,
+      message: 'Book updated successfully',
+      data: book,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateBookValidators = [
   param('id').isMongoId().withMessage('Invalid book ID'),
-  // Make all fields optional for partial updates
   body('title').optional().trim().notEmpty().withMessage('Title cannot be empty'),
   body('author').optional().trim().notEmpty().withMessage('Author cannot be empty'),
   body('price').optional().isFloat({ min: 0 }).withMessage('Price must be a positive number'),
@@ -304,55 +431,16 @@ router.put(
     .optional()
     .matches(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)
     .withMessage('Invalid hex color'),
-  body('imageUrl').optional().trim(),
+  body('imageUrl').optional(),
   body('inStock').optional().isBoolean(),
   body('onDemand').optional().isBoolean(),
   body('sortOrder').optional().isInt().toInt(),
   validate,
-  async (req, res, next) => {
-    try {
-      let updateData = { ...req.body };
-      
-      // If title is being updated, handle slug generation
-      if (updateData.title) {
-         let baseSlug = updateData.title
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)+/g, '');
-        
-        let slug = baseSlug;
-        let slugExists = await Book.findOne({ slug, _id: { $ne: req.params.id } });
-        let counter = 1;
-        while (slugExists) {
-          slug = `${baseSlug}-${counter}`;
-          slugExists = await Book.findOne({ slug, _id: { $ne: req.params.id } });
-          counter++;
-        }
-        updateData.slug = slug;
-      }
-      
-      const book = await Book.findByIdAndUpdate(req.params.id, updateData, {
-        new: true, // return the updated document
-        runValidators: true, // apply schema validation on update
-      });
+];
 
-      if (!book) {
-        return res.status(404).json({
-          success: false,
-          message: 'Book not found',
-        });
-      }
-
-      res.json({
-        success: true,
-        message: 'Book updated successfully',
-        data: book,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-);
+/* ─── PUT & PATCH /api/books/:id — Update Book (Admin Only) ─────── */
+router.put('/:id', protect, adminOnly, updateBookValidators, updateBookHandler);
+router.patch('/:id', protect, adminOnly, updateBookValidators, updateBookHandler);
 
 /* ─── DELETE /api/books/:id — Delete Book (Admin Only) ──── */
 router.delete(
@@ -372,6 +460,7 @@ router.delete(
         });
       }
 
+      res.set('Cache-Control', 'no-store');
       res.json({
         success: true,
         message: 'Book deleted successfully',

@@ -124,7 +124,26 @@ async function initCarousel() {
 
   showLoading(track);
 
-  const featured = await getFeaturedBooks();
+  const res = await fetchBooks({ featured: true, limit: 20 });
+
+  if (!res.success) {
+    if (res.status === 429 || res.errorType === 'RATE_LIMITED') {
+      track.innerHTML = `
+        <div class="carousel-error-notice" style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; width: 100%;">
+          <p style="color: var(--text-muted); margin-bottom: 12px;">⏳ Server is busy. Please wait a moment.</p>
+          <button class="btn btn-outline btn-sm" onclick="initCarousel()">Retry</button>
+        </div>`;
+      return;
+    }
+    track.innerHTML = `
+      <div class="carousel-error-notice" style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; width: 100%;">
+        <p style="color: var(--text-muted); margin-bottom: 12px;">⚠️ Temporary connection delay.</p>
+        <button class="btn btn-outline btn-sm" onclick="initCarousel()">Retry</button>
+      </div>`;
+    return;
+  }
+
+  const featured = res.data || [];
 
   if (!featured.length) {
     track.innerHTML = '<p style="text-align:center; color: var(--text-muted); padding: 40px;">No featured books available.</p>';
@@ -266,6 +285,34 @@ async function initCatalog() {
     if (sort && sort !== 'default') queryParams.sort = sort;
 
     const result = await fetchBooks(queryParams);
+
+    // Handle failure modes with explicit user guidance
+    if (!result.success) {
+      if (resultsCount) resultsCount.textContent = 'Unable to load books';
+      if (paginationContainer) paginationContainer.innerHTML = '';
+
+      if (result.status === 429 || result.errorType === 'RATE_LIMITED') {
+        grid.innerHTML = `
+          <div class="error-notice" style="grid-column: 1 / -1;">
+            <div class="error-notice-icon">⏳</div>
+            <h3>Server is busy</h3>
+            <p>We are receiving a high volume of requests. Please wait a moment and click Retry.</p>
+            <button class="btn btn-primary mt-3" id="retry-catalog-btn">Retry Now</button>
+          </div>`;
+      } else {
+        grid.innerHTML = `
+          <div class="error-notice" style="grid-column: 1 / -1;">
+            <div class="error-notice-icon">⚠️</div>
+            <h3>Temporary Connection Issue</h3>
+            <p>${result.message || 'Our servers are taking longer than usual to respond. Please try again.'}</p>
+            <button class="btn btn-primary mt-3" id="retry-catalog-btn">Retry Now</button>
+          </div>`;
+      }
+
+      document.getElementById('retry-catalog-btn')?.addEventListener('click', () => render());
+      return;
+    }
+
     const books = result.data || [];
     const pagination = result.pagination || {};
 

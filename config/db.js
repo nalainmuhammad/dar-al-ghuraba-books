@@ -6,10 +6,13 @@ const mongoose = require('mongoose');
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI, {
-      // Mongoose 8 uses the new URL parser and unified topology by default
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
+      // Mongoose 8 defaults to the new URL parser and unified topology
+      maxPoolSize: 20, // increased connection pool for concurrent traffic
+      minPoolSize: 2,  // maintain warm connections to avoid cold starts
+      serverSelectionTimeoutMS: 15000, // 15s timeout to prevent premature timeouts during Atlas replica set failovers
+      connectTimeoutMS: 15000,
       socketTimeoutMS: 45000,
+      maxIdleTimeMS: 30000, // close idle connections before cloud firewalls terminate them
     });
 
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
@@ -20,7 +23,7 @@ const connectDB = async () => {
     });
 
     mongoose.connection.on('disconnected', () => {
-      console.warn('⚠️  MongoDB disconnected. Attempting to reconnect...');
+      console.warn('⚠️  MongoDB disconnected. Waiting for auto-reconnect...');
     });
 
     mongoose.connection.on('reconnected', () => {

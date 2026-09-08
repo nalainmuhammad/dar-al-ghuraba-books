@@ -11,6 +11,29 @@ async function loadProduct() {
   const container = document.getElementById('product-container');
   if (!container) return;
 
+  // Check if server already signaled not-found or server-busy
+  if (window.__INITIAL_BOOK_NOT_FOUND__) {
+    container.innerHTML = `
+      <div class="no-results" style="padding: 80px 20px;">
+        <div class="no-results-icon">📖</div>
+        <h3>Book Not Found</h3>
+        <p>The book you are looking for does not exist or may have been removed.</p>
+        <a href="/catalog.html" class="btn btn-primary mt-3">Back to Catalog</a>
+      </div>`;
+    return;
+  }
+
+  if (window.__INITIAL_SERVER_ERROR__) {
+    container.innerHTML = `
+      <div class="error-notice" style="padding: 80px 20px; text-align: center;">
+        <div class="error-notice-icon">⏳</div>
+        <h3>Server is busy</h3>
+        <p>Our servers are experiencing temporary high traffic. Please retry in a few moments.</p>
+        <button class="btn btn-primary mt-3" onclick="window.location.reload()">Retry Now</button>
+      </div>`;
+    return;
+  }
+
   // The server injects __INITIAL_BOOK_SLUG__ into the HTML
   const slug = window.__INITIAL_BOOK_SLUG__;
 
@@ -21,17 +44,64 @@ async function loadProduct() {
 
   try {
     const res = await fetch(`/api/books/slug/${slug}`);
+
+    // Differentiate explicit 404 (genuine not found) from rate-limiting and server timeouts
+    if (res.status === 404) {
+      container.innerHTML = `
+        <div class="no-results" style="padding: 80px 20px;">
+          <div class="no-results-icon">📖</div>
+          <h3>Book Not Found</h3>
+          <p>The book you are looking for does not exist or may have been removed.</p>
+          <a href="/catalog.html" class="btn btn-primary mt-3">Back to Catalog</a>
+        </div>`;
+      return;
+    }
+
+    if (res.status === 429) {
+      container.innerHTML = `
+        <div class="error-notice" style="padding: 80px 20px; text-align: center;">
+          <div class="error-notice-icon">⏳</div>
+          <h3>Server is busy</h3>
+          <p>Too many requests at this moment. Please wait a moment and click Retry.</p>
+          <button class="btn btn-primary mt-3" onclick="loadProduct()">Retry Now</button>
+        </div>`;
+      return;
+    }
+
+    if (!res.ok) {
+      container.innerHTML = `
+        <div class="error-notice" style="padding: 80px 20px; text-align: center;">
+          <div class="error-notice-icon">⚠️</div>
+          <h3>Server Temporarily Unavailable</h3>
+          <p>We are experiencing temporary connection delay. Please click retry.</p>
+          <button class="btn btn-primary mt-3" onclick="loadProduct()">Retry Now</button>
+        </div>`;
+      return;
+    }
+
     const data = await res.json();
 
     if (!data.success || !data.data) {
-      container.innerHTML = '<div class="no-results"><div class="no-results-icon">😕</div><h3>Book not found</h3><a href="/catalog.html" class="btn btn-primary mt-3">Back to Catalog</a></div>';
+      container.innerHTML = `
+        <div class="no-results" style="padding: 80px 20px;">
+          <div class="no-results-icon">📖</div>
+          <h3>Book Not Found</h3>
+          <p>The book you are looking for does not exist or may have been removed.</p>
+          <a href="/catalog.html" class="btn btn-primary mt-3">Back to Catalog</a>
+        </div>`;
       return;
     }
 
     renderProduct(data.data);
   } catch (err) {
     console.error('Error loading product:', err);
-    container.innerHTML = '<div class="no-results"><h3>Error loading book details</h3></div>';
+    container.innerHTML = `
+      <div class="error-notice" style="padding: 80px 20px; text-align: center;">
+        <div class="error-notice-icon">⚠️</div>
+        <h3>Server is busy, please retry</h3>
+        <p>A temporary network delay occurred while loading this book.</p>
+        <button class="btn btn-primary mt-3" onclick="loadProduct()">Retry Now</button>
+      </div>`;
   }
 }
 

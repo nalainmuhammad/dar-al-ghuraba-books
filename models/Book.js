@@ -100,13 +100,15 @@ bookSchema.pre('save', function (next) {
 
 /* ─── Indexes for Performance ───────────────────────────────
    - Text index: powers the search bar (title, author, description)
-   - Category index: fast filtering by category
-   - Featured index: homepage featured carousel query
-   - Compound index: common catalog query pattern             */
+   - Slug index: fast lookups for SSR and client product routes
+   - Compound indexes: homepage carousel, catalog sorting, category filtering
+   - Filter indexes: author, language, price, sortOrder         */
 bookSchema.index({ title: 'text', author: 'text', description: 'text' }, { language_override: 'dummy_field_ignore' });
-bookSchema.index({ category: 1 });
-bookSchema.index({ featured: 1 });
+bookSchema.index({ category: 1, sortOrder: 1, createdAt: -1 });
+bookSchema.index({ featured: 1, sortOrder: 1, createdAt: -1 });
 bookSchema.index({ category: 1, language: 1 });
+bookSchema.index({ author: 1 });
+bookSchema.index({ language: 1 });
 bookSchema.index({ price: 1 });
 bookSchema.index({ sortOrder: 1 });
 bookSchema.index({ sortOrder: 1, createdAt: -1 });

@@ -270,7 +270,15 @@ async function authFetch(url, options = {}) {
     logout();
     throw new Error('Session expired. Please log in again.');
   }
-  return res.json();
+  if (res.status === 429) {
+    throw new Error('Server is busy (rate limit reached). Please wait a moment and retry.');
+  }
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.message || `Request failed with status ${res.status}`);
+  }
+  return data;
 }
 
 /* ─── Navigation ────────────────────────────────────────── */
@@ -612,6 +620,8 @@ async function handleBookSubmit(e) {
     }
   }
 
+  const bookId = document.getElementById('form-book-id').value;
+
   const bookData = {
     title: document.getElementById('form-book-title').value.trim(),
     author: document.getElementById('form-book-author').value.trim(),
@@ -621,15 +631,20 @@ async function handleBookSubmit(e) {
     format: document.getElementById('form-book-format').value || 'Hardcover',
     description: document.getElementById('form-book-description').value.trim(),
     color: document.getElementById('form-book-color').value,
-    imageUrl: imageUrl,
     featured: document.getElementById('form-book-featured').checked,
     inStock: document.getElementById('form-book-instock').checked,
     onDemand: document.getElementById('form-book-ondemand')?.checked || false,
     sortOrder: parseInt(document.getElementById('form-book-sortorder').value) || 0,
   };
 
+  // Only include imageUrl if explicitly provided, to avoid wiping existing images on partial edits
+  if (imageUrl) {
+    bookData.imageUrl = imageUrl;
+  } else if (!bookId) {
+    bookData.imageUrl = '';
+  }
+
   try {
-    const bookId = document.getElementById('form-book-id').value;
     let data;
 
     if (bookId) {

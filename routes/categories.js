@@ -30,6 +30,7 @@ const validate = (req, res, next) => {
 router.get('/', async (req, res, next) => {
   try {
     const categories = await Category.find().sort({ name: 1 }).lean();
+    res.set('Cache-Control', 'public, max-age=600, stale-while-revalidate=1200');
     res.json({ success: true, data: categories });
   } catch (error) {
     next(error);
@@ -47,6 +48,7 @@ router.get(
       if (!category) {
         return res.status(404).json({ success: false, message: 'Category not found' });
       }
+      res.set('Cache-Control', 'public, max-age=600, stale-while-revalidate=1200');
       res.json({ success: true, data: category });
     } catch (error) {
       next(error);
@@ -73,6 +75,7 @@ router.post(
       }
 
       const category = await Category.create(req.body);
+      res.set('Cache-Control', 'no-store');
       res.status(201).json({ success: true, message: 'Category created', data: category });
     } catch (error) {
       next(error);
@@ -111,6 +114,7 @@ router.put(
         await Book.updateMany({ category: oldName }, { category: req.body.name });
       }
 
+      res.set('Cache-Control', 'no-store');
       res.json({ success: true, message: 'Category updated', data: category });
     } catch (error) {
       if (error.code === 11000) {
@@ -141,6 +145,7 @@ router.delete(
       await Book.deleteMany({ category: catName });
       await category.deleteOne();
 
+      res.set('Cache-Control', 'no-store');
       res.json({ success: true, message: 'Category and all associated books deleted' });
     } catch (error) {
       next(error);

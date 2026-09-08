@@ -1240,6 +1240,50 @@ body.menu-open .navbar.scrolled {
   color: var(--text-muted);
 }
 
+/* Error & Server Busy Notices */
+.error-notice {
+  text-align: center;
+  padding: 60px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow-sm);
+  max-width: 520px;
+  margin: 40px auto;
+}
+
+.error-notice .error-notice-icon {
+  font-size: 3.2rem;
+  margin-bottom: 16px;
+  display: inline-block;
+  animation: pulseIcon 2s ease-in-out infinite;
+}
+
+.error-notice h3 {
+  margin-bottom: 10px;
+  color: var(--text-primary);
+  font-size: 1.4rem;
+}
+
+.error-notice p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 440px;
+  margin: 0 auto 20px;
+}
+
+.carousel-error-notice {
+  text-align: center;
+  padding: 40px 20px;
+  width: 100%;
+}
+
+@keyframes pulseIcon {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
 /* ─── About Page ────────────────────────────────────────── */
 .about-hero {
   padding: calc(var(--nav-height) + 80px) 0 80px;
