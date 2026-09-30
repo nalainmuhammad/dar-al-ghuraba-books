@@ -1,550 +1,616 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Secure Checkout — Dar Al Ghuraba Books</title>
   <meta name="description" content="Complete your purchase securely at Dar Al Ghuraba Books. We accept Visa, Mastercard, Safepay, JazzCash, Easypaisa, and Cash on Delivery.">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" type="image/jpeg" href="assets/images/logo.jpg">
+  
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cinzel:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/styles.css?v=5">
   <style>
-    :root {
-      --checkout-gold: #c5a059;
-      --checkout-emerald: #0f3d24;
-      --checkout-bg: #0d1310;
-      --checkout-card: #151e18;
-      --checkout-border: #233328;
-      --checkout-text: #e8ece9;
-      --checkout-muted: #8b9d90;
-    }
-
-    body {
-      background-color: var(--checkout-bg);
-      color: var(--checkout-text);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* ─── Checkout Specific Polish & Theme Harmonization ─── */
+    .checkout-page-wrapper {
       min-height: 100vh;
-      margin: 0;
-      padding: 0;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background var(--transition-base), color var(--transition-base);
     }
 
-    /* Checkout Header */
-    .checkout-header {
-      border-bottom: 1px solid var(--checkout-border);
-      background: rgba(15, 61, 36, 0.4);
-      backdrop-filter: blur(12px);
-      padding: 18px 0;
+    .checkout-navbar {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 16px 0;
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
     }
-    .checkout-header-inner {
-      max-width: 1200px;
+
+    .checkout-nav-container {
+      max-width: var(--page-width);
       margin: 0 auto;
       padding: 0 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .checkout-logo {
-      font-family: 'Cinzel', serif;
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: #fff;
+
+    .checkout-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
       text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      letter-spacing: 0.04em;
-    }
-    .checkout-logo span {
-      color: var(--checkout-gold);
-    }
-    .security-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.85rem;
-      color: var(--checkout-muted);
-      background: rgba(255, 255, 255, 0.04);
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1px solid var(--checkout-border);
-    }
-    .security-badge svg {
-      color: var(--checkout-gold);
+      color: var(--text-primary);
     }
 
-    /* Main Container */
-    .checkout-container {
-      max-width: 1200px;
-      margin: 40px auto 80px;
+    .checkout-brand img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1.5px solid var(--accent-gold);
+    }
+
+    .checkout-brand-title {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: 0.03em;
+    }
+
+    .checkout-brand-title span {
+      color: var(--accent-gold);
+    }
+
+    .checkout-nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .security-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--accent-emerald);
+      background: rgba(var(--accent-emerald-rgb), 0.1);
+      border: 1px solid rgba(var(--accent-emerald-rgb), 0.25);
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+
+    /* Main Grid */
+    .checkout-grid {
+      max-width: var(--page-width);
+      margin: 36px auto 80px;
       padding: 0 24px;
       display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 40px;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 32px;
       align-items: start;
     }
 
     @media (max-width: 960px) {
-      .checkout-container {
+      .checkout-grid {
         grid-template-columns: 1fr;
-        gap: 30px;
+        gap: 24px;
+        margin: 20px auto 60px;
+        padding: 0 16px;
       }
     }
 
-    /* Card Panels */
-    .checkout-panel {
-      background: var(--checkout-card);
-      border: 1px solid var(--checkout-border);
-      border-radius: 14px;
+    /* Cards */
+    .checkout-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--card-radius);
       padding: 28px;
+      box-shadow: var(--shadow-sm);
       margin-bottom: 24px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+      transition: all var(--transition-base);
     }
-    .panel-title {
+
+    .card-heading {
       font-family: 'Cinzel', serif;
       font-size: 1.2rem;
-      font-weight: 600;
-      color: #fff;
-      margin-top: 0;
-      margin-bottom: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
       gap: 10px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--checkout-border);
     }
-    .step-number {
-      width: 28px;
-      height: 28px;
+
+    .step-pill {
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--checkout-gold), #9a7632);
-      color: #0d1310;
+      background: var(--accent-gold);
+      color: #0C1410;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       font-size: 0.85rem;
       font-weight: 700;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
     }
 
-    /* Form Fields */
-    .form-row {
+    /* Form Styles */
+    .form-grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
       margin-bottom: 16px;
     }
-    .form-group {
+
+    @media (max-width: 600px) {
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+    }
+
+    .form-field {
       margin-bottom: 16px;
     }
-    .form-group.full-width {
-      grid-column: 1 / -1;
-    }
-    label {
+
+    .form-field label {
       display: block;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--checkout-muted);
-      margin-bottom: 6px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 7px;
     }
-    .form-control {
+
+    .form-field .field-hint {
+      font-size: 0.76rem;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .input-box {
       width: 100%;
       box-sizing: border-box;
-      background: #0d1410;
-      border: 1px solid var(--checkout-border);
-      border-radius: 8px;
+      background: var(--bg-primary);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: 10px;
       padding: 12px 14px;
       font-size: 0.95rem;
-      color: #fff;
-      transition: all 0.2s ease;
+      color: var(--text-primary);
       font-family: inherit;
+      transition: all var(--transition-fast);
     }
-    .form-control:focus {
+
+    .input-box:focus {
       outline: none;
-      border-color: var(--checkout-gold);
-      box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.15);
+      border-color: var(--accent-emerald);
+      box-shadow: 0 0 0 3px rgba(var(--accent-emerald-rgb), 0.15);
+      background: var(--bg-secondary);
     }
-    select.form-control {
+
+    select.input-box {
       cursor: pointer;
       appearance: none;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c5a059' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C9973A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat;
       background-position: right 14px center;
       background-size: 16px;
       padding-right: 40px;
     }
 
-    /* Payment Methods Grid */
-    .payment-options {
+    /* Payment Methods */
+    .payment-list {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
-    .payment-option {
-      border: 1.5px solid var(--checkout-border);
-      border-radius: 10px;
+
+    .payment-item {
+      border: 1.5px solid var(--border-subtle);
+      border-radius: 12px;
       padding: 16px;
       cursor: pointer;
-      transition: all 0.2s ease;
-      background: #0d1410;
+      background: var(--bg-primary);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
+      transition: all var(--transition-fast);
     }
-    .payment-option:hover {
-      border-color: #3d5644;
+
+    .payment-item:hover {
+      border-color: var(--accent-emerald);
+      transform: translateY(-1px);
     }
-    .payment-option.selected {
-      border-color: var(--checkout-gold);
-      background: rgba(197, 160, 89, 0.06);
+
+    .payment-item.selected {
+      border-color: var(--accent-gold);
+      background: rgba(var(--accent-gold-rgb), 0.08);
+      box-shadow: 0 0 0 1px var(--accent-gold);
     }
-    .payment-radio-wrap {
+
+    .payment-left {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-    .payment-radio-wrap input[type="radio"] {
-      accent-color: var(--checkout-gold);
+
+    .payment-left input[type="radio"] {
+      accent-color: var(--accent-gold);
       width: 18px;
       height: 18px;
       cursor: pointer;
     }
-    .payment-name {
+
+    .payment-title-wrap .title {
       font-weight: 600;
-      color: #fff;
+      color: var(--text-primary);
       font-size: 0.95rem;
     }
-    .payment-subtitle {
+
+    .payment-title-wrap .subtitle {
       font-size: 0.8rem;
-      color: var(--checkout-muted);
+      color: var(--text-muted);
       margin-top: 2px;
     }
-    .payment-badges {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .badge-tag {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 4px;
-      padding: 3px 8px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-    }
-    .badge-visa { color: #5bc0de; }
-    .badge-master { color: #f0ad4e; }
-    .badge-jazz { color: #d9534f; }
-    .badge-easy { color: #5cb85c; }
-    .badge-cod { color: var(--checkout-gold); }
 
-    /* Order Summary Sticky Sidebar */
-    .order-summary {
+    .badge-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tag-chip {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .tag-chip.safepay { color: #2B6CB0; border-color: rgba(43, 108, 176, 0.3); }
+    .tag-chip.jazz { color: #C53030; border-color: rgba(197, 48, 48, 0.3); }
+    .tag-chip.easy { color: #2F855A; border-color: rgba(47, 133, 90, 0.3); }
+    .tag-chip.cod { color: var(--accent-gold); border-color: rgba(201, 151, 58, 0.4); }
+
+    /* Order Summary Sidebar */
+    .summary-sidebar {
       position: sticky;
       top: 100px;
     }
-    .cart-summary-items {
+
+    .summary-items-box {
       max-height: 280px;
       overflow-y: auto;
       margin-bottom: 20px;
-      padding-right: 6px;
+      padding-right: 4px;
     }
-    .summary-item {
+
+    .order-row-item {
       display: flex;
       gap: 14px;
       padding: 12px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid var(--border-subtle);
       align-items: center;
     }
-    .summary-item-thumb {
-      width: 48px;
-      height: 64px;
+
+    .order-item-img {
+      width: 50px;
+      height: 66px;
       object-fit: cover;
-      border-radius: 6px;
-      background: #111;
-      border: 1px solid var(--checkout-border);
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-tertiary);
       flex-shrink: 0;
     }
-    .summary-item-info {
+
+    .order-item-desc {
       flex: 1;
       min-width: 0;
     }
-    .summary-item-title {
-      font-size: 0.9rem;
+
+    .order-item-desc .item-name {
+      font-size: 0.88rem;
       font-weight: 600;
-      color: #fff;
+      color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .summary-item-meta {
-      font-size: 0.8rem;
-      color: var(--checkout-muted);
+
+    .order-item-desc .item-qty {
+      font-size: 0.78rem;
+      color: var(--text-muted);
       margin-top: 2px;
     }
-    .summary-item-price {
+
+    .order-item-cost {
       font-weight: 600;
-      color: #fff;
-      font-size: 0.9rem;
+      font-size: 0.92rem;
+      color: var(--text-primary);
       text-align: right;
     }
 
     /* Price Breakdown */
-    .price-breakdown {
-      border-top: 1px solid var(--checkout-border);
+    .calc-list {
+      border-top: 1px solid var(--border-subtle);
       padding-top: 16px;
       margin-bottom: 20px;
     }
-    .price-row {
+
+    .calc-row {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       margin-bottom: 10px;
       font-size: 0.9rem;
-      color: var(--checkout-muted);
+      color: var(--text-secondary);
     }
-    .price-row.total-row {
-      border-top: 1px dashed var(--checkout-border);
+
+    .calc-row.total-row {
+      border-top: 1.5px dashed var(--border-subtle);
       padding-top: 14px;
       margin-top: 14px;
       font-size: 1.25rem;
-      font-weight: 700;
-      color: #fff;
+      font-weight: 800;
+      color: var(--text-primary);
     }
-    .price-row.total-row .total-amount {
-      color: var(--checkout-gold);
+
+    .calc-row.total-row .highlight {
+      color: var(--accent-gold);
     }
-    .shipping-calc-badge {
-      display: inline-block;
-      font-size: 0.75rem;
-      color: var(--checkout-gold);
-      background: rgba(197, 160, 89, 0.12);
+
+    .badge-shipping {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--accent-emerald);
+      background: rgba(var(--accent-emerald-rgb), 0.12);
       padding: 2px 8px;
       border-radius: 4px;
       margin-left: 6px;
     }
 
-    /* Submit Button */
-    .btn-place-order {
+    /* Primary Action Button */
+    .btn-checkout-submit {
       width: 100%;
-      background: linear-gradient(135deg, var(--checkout-gold), #a57d34);
-      color: #0d1310;
+      background: linear-gradient(135deg, var(--accent-gold) 0%, #A57D34 100%);
+      color: #0C1410;
       font-weight: 700;
       font-size: 1.05rem;
       padding: 16px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      transition: all 0.2s ease;
-      letter-spacing: 0.02em;
+      transition: all var(--transition-fast);
+      box-shadow: 0 4px 15px rgba(201, 151, 58, 0.25);
     }
-    .btn-place-order:hover {
-      background: linear-gradient(135deg, #d4af37, #b88d3e);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(197, 160, 89, 0.3);
+
+    .btn-checkout-submit:hover {
+      background: linear-gradient(135deg, var(--accent-gold-light) 0%, var(--accent-gold) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(201, 151, 58, 0.35);
     }
-    .btn-place-order:disabled {
+
+    .btn-checkout-submit:disabled {
       opacity: 0.6;
       cursor: not-allowed;
       transform: none;
       box-shadow: none;
     }
 
-    .checkout-alert {
-      padding: 12px 16px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-size: 0.9rem;
+    /* Alerts */
+    .checkout-alert-box {
+      padding: 14px 18px;
+      border-radius: 10px;
+      margin-bottom: 24px;
+      font-size: 0.92rem;
       display: none;
     }
-    .checkout-alert.error {
+
+    .checkout-alert-box.error {
       display: block;
-      background: rgba(220, 53, 69, 0.15);
+      background: rgba(220, 53, 69, 0.12);
       border: 1px solid rgba(220, 53, 69, 0.4);
-      color: #ff8585;
-    }
-    .checkout-alert.info {
-      display: block;
-      background: rgba(197, 160, 89, 0.12);
-      border: 1px solid rgba(197, 160, 89, 0.3);
-      color: var(--checkout-gold);
+      color: #DC3545;
     }
 
-    .empty-cart-state {
+    [data-theme="dark"] .checkout-alert-box.error {
+      color: #FF7675;
+      background: rgba(220, 53, 69, 0.2);
+    }
+
+    .empty-cart-view {
       text-align: center;
       padding: 40px 20px;
     }
-    .empty-cart-state a {
-      color: var(--checkout-gold);
+
+    .empty-cart-view a {
+      color: var(--accent-gold);
+      font-weight: 600;
       text-decoration: underline;
-      margin-top: 10px;
+      margin-top: 12px;
       display: inline-block;
     }
   </style>
 </head>
-<body>
+<body class="checkout-page-wrapper">
 
-  <!-- Checkout Header -->
-  <header class="checkout-header">
-    <div class="checkout-header-inner">
-      <a href="/" class="checkout-logo">
-        <span>Dar Al Ghuraba</span> Books
+  <!-- ─── Checkout Navbar ─────────────────────────────────── -->
+  <nav class="checkout-navbar">
+    <div class="checkout-nav-container">
+      <a href="catalog.html" class="checkout-brand">
+        <img src="assets/images/logo.jpg" alt="Dar Al Ghuraba Logo">
+        <div class="checkout-brand-title">
+          <span>Dar Al Ghuraba</span> Books
+        </div>
       </a>
-      <div class="security-badge">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-        </svg>
-        <span>256-Bit SSL Encrypted Checkout</span>
+
+      <div class="checkout-nav-right">
+        <div class="security-badge">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>SSL 256-Bit Secure</span>
+        </div>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme" style="background:none; border:1px solid var(--border-subtle); border-radius:50%; width:38px; height:38px; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;">🌙</button>
       </div>
     </div>
-  </header>
+  </nav>
 
-  <!-- Checkout Main Form -->
-  <main class="checkout-container">
+  <!-- ─── Main Checkout Container ─────────────────────────── -->
+  <main class="checkout-grid">
     
-    <!-- Left Column: Shipping & Payment -->
-    <div class="checkout-main">
-      <div id="checkout-alert" class="checkout-alert"></div>
+    <!-- Left: Delivery & Payment Details -->
+    <div class="checkout-form-col">
+      <div id="checkout-alert" class="checkout-alert-box"></div>
 
-      <!-- Step 1: Customer & Delivery Details -->
-      <section class="checkout-panel">
-        <h2 class="panel-title">
-          <span class="step-number">1</span> Delivery & Shipping Details
+      <!-- Step 1: Customer Details -->
+      <section class="checkout-card">
+        <h2 class="card-heading">
+          <span class="step-pill">1</span> Delivery & Contact Details
         </h2>
 
         <form id="checkout-form">
-          <div class="form-row">
-            <div class="form-group">
+          <div class="form-grid-2">
+            <div class="form-field">
               <label for="cust-name">Full Name *</label>
-              <input type="text" id="cust-name" class="form-control" placeholder="Muhammad Ali" required>
+              <input type="text" id="cust-name" class="input-box" placeholder="e.g. Nalain Muhammad" required>
             </div>
-            <div class="form-group">
-              <label for="cust-email">Email Address * (for confirmation & receipt)</label>
-              <input type="email" id="cust-email" class="form-control" placeholder="ali@example.com" required>
+            <div class="form-field">
+              <label for="cust-email">Email Address * <span class="field-hint">(for receipts & tracking)</span></label>
+              <input type="email" id="cust-email" class="input-box" placeholder="e.g. yourname@gmail.com" required>
             </div>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
+          <div class="form-grid-2">
+            <div class="form-field">
               <label for="cust-phone">WhatsApp / Phone Number *</label>
-              <input type="tel" id="cust-phone" class="form-control" placeholder="0300 1234567" required>
+              <input type="tel" id="cust-phone" class="input-box" placeholder="e.g. 0347 1224500" required>
             </div>
-            <div class="form-group">
+            <div class="form-field">
               <label for="cust-country">Destination Country *</label>
-              <select id="cust-country" class="form-control" required>
-                <option value="PK" data-code="PK" selected>🇵🇰 Pakistan (Domestic)</option>
+              <select id="cust-country" class="input-box" required>
+                <option value="PK" data-code="PK" selected>🇵🇰 Pakistan (Domestic Delivery)</option>
               </select>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="cust-address">Street Address, House/Apt No. *</label>
-            <input type="text" id="cust-address" class="form-control" placeholder="House 12, Street 4, Sector G-9/1" required>
+          <div class="form-field">
+            <label for="cust-address">Street Address, House / Flat No. *</label>
+            <input type="text" id="cust-address" class="input-box" placeholder="e.g. Lane number 4, Attock Cantt" required>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
+          <div class="form-grid-2">
+            <div class="form-field">
               <label for="cust-city">City *</label>
-              <input type="text" id="cust-city" class="form-control" placeholder="Islamabad" required>
+              <input type="text" id="cust-city" class="input-box" placeholder="e.g. Attock" required>
             </div>
-            <div class="form-group">
+            <div class="form-field">
               <label for="cust-postal">Postal / Zip Code (optional)</label>
-              <input type="text" id="cust-postal" class="form-control" placeholder="44000">
+              <input type="text" id="cust-postal" class="input-box" placeholder="e.g. 43600">
             </div>
           </div>
 
-          <div class="form-group">
+          <div class="form-field" style="margin-bottom: 0;">
             <label for="cust-notes">Delivery Instructions / Notes (optional)</label>
-            <input type="text" id="cust-notes" class="form-control" placeholder="e.g. Call before delivery, leave with guard">
+            <input type="text" id="cust-notes" class="input-box" placeholder="e.g. Call before delivery, leave with neighbor">
           </div>
         </form>
       </section>
 
-      <!-- Step 2: Payment Method Selection -->
-      <section class="checkout-panel">
-        <h2 class="panel-title">
-          <span class="step-number">2</span> Payment Method
+      <!-- Step 2: Payment Selection -->
+      <section class="checkout-card">
+        <h2 class="card-heading">
+          <span class="step-pill">2</span> Select Payment Method
         </h2>
 
-        <div class="payment-options">
+        <div class="payment-list">
 
-          <!-- Safepay (Visa / Mastercard) -->
-          <label class="payment-option selected" for="pay-safepay">
-            <div class="payment-radio-wrap">
+          <!-- Safepay -->
+          <label class="payment-item selected" for="pay-safepay">
+            <div class="payment-left">
               <input type="radio" id="pay-safepay" name="paymentMethod" value="safepay" checked>
-              <div>
-                <div class="payment-name">Visa / Mastercard / Debit Card</div>
-                <div class="payment-subtitle">Powered by Safepay — Secure local & international card gateway</div>
+              <div class="payment-title-wrap">
+                <div class="title">Debit / Credit Card (Visa & Mastercard)</div>
+                <div class="subtitle">Instant secure payment via Safepay</div>
               </div>
             </div>
-            <div class="payment-badges">
-              <span class="badge-tag badge-visa">VISA</span>
-              <span class="badge-tag badge-master">Mastercard</span>
-              <span class="badge-tag">PayPak</span>
+            <div class="badge-group">
+              <span class="tag-chip safepay">VISA</span>
+              <span class="tag-chip safepay">Mastercard</span>
+              <span class="tag-chip">PayPak</span>
             </div>
           </label>
 
           <!-- JazzCash -->
-          <label class="payment-option" for="pay-jazzcash">
-            <div class="payment-radio-wrap">
+          <label class="payment-item" for="pay-jazzcash">
+            <div class="payment-left">
               <input type="radio" id="pay-jazzcash" name="paymentMethod" value="jazzcash">
-              <div>
-                <div class="payment-name">JazzCash</div>
-                <div class="payment-subtitle">Pay via JazzCash Mobile Account or Voucher</div>
+              <div class="payment-title-wrap">
+                <div class="title">JazzCash Mobile Account</div>
+                <div class="subtitle">Pay via your JazzCash wallet</div>
               </div>
             </div>
-            <div class="payment-badges">
-              <span class="badge-tag badge-jazz">JazzCash</span>
+            <div class="badge-group">
+              <span class="tag-chip jazz">JazzCash</span>
             </div>
           </label>
 
           <!-- Easypaisa -->
-          <label class="payment-option" for="pay-easypaisa">
-            <div class="payment-radio-wrap">
+          <label class="payment-item" for="pay-easypaisa">
+            <div class="payment-left">
               <input type="radio" id="pay-easypaisa" name="paymentMethod" value="easypaisa">
-              <div>
-                <div class="payment-name">Easypaisa</div>
-                <div class="payment-subtitle">Pay via Easypaisa Mobile Account or QR</div>
+              <div class="payment-title-wrap">
+                <div class="title">Easypaisa Mobile Account</div>
+                <div class="subtitle">Pay via your Easypaisa wallet or QR</div>
               </div>
             </div>
-            <div class="payment-badges">
-              <span class="badge-tag badge-easy">Easypaisa</span>
+            <div class="badge-group">
+              <span class="tag-chip easy">Easypaisa</span>
             </div>
           </label>
 
-          <!-- Cash on Delivery (Pakistan only) -->
-          <label class="payment-option" id="cod-option-wrap" for="pay-cod">
-            <div class="payment-radio-wrap">
+          <!-- Cash on Delivery -->
+          <label class="payment-item" id="cod-option-wrap" for="pay-cod">
+            <div class="payment-left">
               <input type="radio" id="pay-cod" name="paymentMethod" value="cod">
-              <div>
-                <div class="payment-name">Cash on Delivery (Pakistan Only)</div>
-                <div class="payment-subtitle">Pay cash when your parcel arrives at your doorstep</div>
+              <div class="payment-title-wrap">
+                <div class="title">Cash on Delivery (Pakistan only)</div>
+                <div class="subtitle">Pay in cash when your parcel is delivered</div>
               </div>
             </div>
-            <div class="payment-badges">
-              <span class="badge-tag badge-cod">COD</span>
+            <div class="badge-group">
+              <span class="tag-chip cod">COD</span>
             </div>
           </label>
 
-          <!-- WhatsApp Manual Order -->
-          <label class="payment-option" for="pay-whatsapp">
-            <div class="payment-radio-wrap">
+          <!-- WhatsApp Order -->
+          <label class="payment-item" for="pay-whatsapp">
+            <div class="payment-left">
               <input type="radio" id="pay-whatsapp" name="paymentMethod" value="whatsapp">
-              <div>
-                <div class="payment-name">Confirm & Pay via WhatsApp</div>
-                <div class="payment-subtitle">Direct order confirmation with our representative on WhatsApp</div>
+              <div class="payment-title-wrap">
+                <div class="title">Confirm & Pay via WhatsApp</div>
+                <div class="subtitle">Direct order handling with our support team</div>
               </div>
             </div>
-            <div class="payment-badges">
-              <span class="badge-tag" style="color: #25D366;">WhatsApp</span>
+            <div class="badge-group">
+              <span class="tag-chip" style="color: #25D366; border-color: rgba(37, 211, 102, 0.4);">WhatsApp</span>
             </div>
           </label>
 
@@ -553,59 +619,77 @@
 
     </div>
 
-    <!-- Right Column: Order Summary -->
-    <aside class="checkout-sidebar">
-      <div class="checkout-panel order-summary">
-        <h2 class="panel-title">
-          Order Summary <span id="cart-item-count" style="font-size: 0.9rem; color: var(--checkout-muted); font-weight: 400;">(0 items)</span>
+    <!-- Right: Sticky Order Summary -->
+    <aside class="checkout-sidebar-col">
+      <div class="checkout-card summary-sidebar">
+        <h2 class="card-heading">
+          Order Summary <span id="cart-item-count" style="font-size: 0.88rem; color: var(--text-muted); font-weight: 500;">(0 items)</span>
         </h2>
 
-        <!-- Items list -->
-        <div id="summary-items-list" class="cart-summary-items">
+        <!-- Cart Items -->
+        <div id="summary-items-list" class="summary-items-box">
           <!-- Populated by checkout.js -->
         </div>
 
-        <!-- Total Weight Note -->
-        <div style="font-size: 0.8rem; color: var(--checkout-muted); margin-bottom: 12px; display: flex; justify-content: space-between;">
-          <span>Estimated Total Weight:</span>
-          <span id="total-weight-display" style="font-weight: 600; color: #fff;">0.5 kg</span>
+        <!-- Total Weight Indicator -->
+        <div style="font-size: 0.84rem; color: var(--text-secondary); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <span>Parcel Weight:</span>
+          <span id="total-weight-display" style="font-weight: 700; color: var(--text-primary);">0.5 kg</span>
         </div>
 
-        <!-- Price breakdown -->
-        <div class="price-breakdown">
-          <div class="price-row">
+        <!-- Price Breakdown -->
+        <div class="calc-list">
+          <div class="calc-row">
             <span>Subtotal</span>
-            <span id="summary-subtotal">Rs. 0</span>
+            <span id="summary-subtotal" style="font-weight: 600;">Rs. 0</span>
           </div>
-          <div class="price-row">
+          <div class="calc-row">
             <span>
               Shipping
-              <span id="shipping-method-tag" class="shipping-calc-badge">Domestic</span>
+              <span id="shipping-method-tag" class="badge-shipping">Air Parcel</span>
             </span>
-            <span id="summary-shipping">Rs. 225</span>
+            <span id="summary-shipping" style="font-weight: 600;">Rs. 225</span>
           </div>
-          <div class="price-row total-row">
+          <div class="calc-row total-row">
             <span>Total to Pay</span>
-            <span class="total-amount" id="summary-total">Rs. 225</span>
+            <span class="highlight" id="summary-total">Rs. 225</span>
           </div>
         </div>
 
-        <button type="button" id="btn-place-order" class="btn-place-order">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button type="button" id="btn-place-order" class="btn-checkout-submit">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
             <line x1="1" y1="10" x2="23" y2="10"></line>
           </svg>
           <span id="place-order-text">Place Order & Pay</span>
         </button>
 
-        <p style="font-size: 0.75rem; color: var(--checkout-muted); text-align: center; margin-top: 14px; line-height: 1.4;">
-          By placing your order, you agree to Dar Al Ghuraba Books delivery & return policies. All transactions are securely encrypted.
+        <p style="font-size: 0.76rem; color: var(--text-muted); text-align: center; margin-top: 14px; line-height: 1.45;">
+          🛡️ Safe & Encrypted. By placing this order, you agree to Dar Al Ghuraba Books delivery & return policies.
         </p>
       </div>
     </aside>
 
   </main>
 
+  <script>
+    // Initialize Theme Sync
+    (function () {
+      const savedTheme = localStorage.getItem('dar_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      const toggleBtn = document.getElementById('theme-toggle');
+      if (toggleBtn) {
+        toggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        toggleBtn.addEventListener('click', () => {
+          const current = document.documentElement.getAttribute('data-theme');
+          const next = current === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', next);
+          localStorage.setItem('dar_theme', next);
+          toggleBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+        });
+      }
+    })();
+  </script>
   <script src="js/checkout.js"></script>
 </body>
 </html>

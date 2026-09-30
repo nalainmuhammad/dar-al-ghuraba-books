@@ -145,6 +145,9 @@ function setupEventListeners() {
     document.getElementById('color-value').textContent = e.target.value;
   });
 
+  // Product Type change listener (dynamic field toggle)
+  document.getElementById('form-book-producttype')?.addEventListener('change', updateProductTypeFields);
+
   // Books table event delegation
   document.getElementById('books-tbody')?.addEventListener('click', (e) => {
     const editBtn = e.target.closest('[data-action="edit-book"]');
@@ -475,6 +478,7 @@ async function loadCategories() {
 function populateCategoryDropdowns() {
   const filterEl = document.getElementById('admin-category-filter');
   const formEl = document.getElementById('form-book-category');
+  const parentCatEl = document.getElementById('form-category-parent');
 
   if (filterEl) {
     filterEl.innerHTML =
@@ -484,7 +488,14 @@ function populateCategoryDropdowns() {
   if (formEl) {
     formEl.innerHTML =
       '<option value="">Select Category</option>' +
-      adminCategories.map((c) => `<option value="${c.name}">${c.name}</option>`).join('');
+      adminCategories.map((c) => `<option value="${c.name}">${c.parentCategory ? '— ' + c.name : c.name}</option>`).join('');
+  }
+  if (parentCatEl) {
+    // Only show root categories as eligible parents
+    const roots = adminCategories.filter((c) => !c.parentCategory && c._id !== editingCategoryId);
+    parentCatEl.innerHTML =
+      '<option value="">None (Top-Level Category)</option>' +
+      roots.map((c) => `<option value="${c._id}">${c.name} (${c.productType || 'book'})</option>`).join('');
   }
 }
 
@@ -493,25 +504,35 @@ function loadCategoriesUI() {
   if (!tbody) return;
 
   if (adminCategories.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="3"><div class="table-empty"><h3>No categories found</h3></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5"><div class="table-empty"><h3>No categories found</h3></div></td></tr>`;
     return;
   }
 
   tbody.innerHTML = adminCategories
-    .map(
-      (cat) => `
-    <tr>
-      <td><strong>${cat.name}</strong></td>
-      <td>${cat.description || '—'}</td>
-      <td>
-        <div class="table-actions">
-          <button class="table-btn table-btn-edit" data-action="edit-category" data-id="${cat._id}">✏️ Edit</button>
-          <button class="table-btn table-btn-delete" data-action="delete-category" data-id="${cat._id}" data-name="${cat.name.replace(/"/g, '&quot;')}">🗑️ Delete</button>
-        </div>
-      </td>
-    </tr>
-  `
-    )
+    .map((cat) => {
+      const typeBadge = {
+        book: '<span class="table-badge" style="background:#2C3E50;color:#fff;">📚 Books</span>',
+        clothing: '<span class="table-badge" style="background:#8E44AD;color:#fff;">👕 Clothing</span>',
+        general: '<span class="table-badge" style="background:#16A085;color:#fff;">📦 General</span>',
+      }[cat.productType || 'book'] || '<span class="table-badge">Book</span>';
+
+      const parentName = cat.parentCategory?.name || (typeof cat.parentCategory === 'string' ? cat.parentCategory : 'Top Level (Root)');
+
+      return `
+      <tr>
+        <td><strong>${cat.name}</strong></td>
+        <td>${typeBadge}</td>
+        <td><span style="font-size:0.88rem;color:var(--text-secondary);">${parentName}</span></td>
+        <td>${cat.description || '—'}</td>
+        <td>
+          <div class="table-actions">
+            <button class="table-btn table-btn-edit" data-action="edit-category" data-id="${cat._id}">✏️ Edit</button>
+            <button class="table-btn table-btn-delete" data-action="delete-category" data-id="${cat._id}" data-name="${cat.name.replace(/"/g, '&quot;')}">🗑️ Delete</button>
+          </div>
+        </td>
+      </tr>
+    `;
+    })
     .join('');
 }
 
@@ -522,6 +543,8 @@ async function handleCategorySubmit(e) {
 
   const categoryData = {
     name: document.getElementById('form-category-name').value.trim(),
+    productType: document.getElementById('form-category-producttype').value,
+    parentCategory: document.getElementById('form-category-parent').value || null,
     description: document.getElementById('form-category-desc').value.trim(),
   };
 
@@ -556,7 +579,10 @@ window.editCategory = async (id) => {
 
     document.getElementById('form-category-id').value = id;
     document.getElementById('form-category-name').value = cat.name;
+    document.getElementById('form-category-producttype').value = cat.productType || 'book';
     document.getElementById('form-category-desc').value = cat.description || '';
+    populateCategoryDropdowns();
+    document.getElementById('form-category-parent').value = cat.parentCategory?._id || cat.parentCategory || '';
     document.getElementById('category-form-title').textContent = 'Edit Category';
 
     document.getElementById('category-modal').style.display = 'flex';
@@ -569,6 +595,7 @@ function clearCategoryForm() {
   editingCategoryId = null;
   document.getElementById('form-category-id').value = '';
   document.getElementById('category-form').reset();
+  populateCategoryDropdowns();
   document.getElementById('category-form-title').textContent = 'Add New Category';
   document.getElementById('category-form-error').style.display = 'none';
 }
@@ -839,11 +866,32 @@ window.editBook = async (id) => {
 
     document.getElementById('form-title').textContent = 'Edit Product / Book';
     document.getElementById('submit-btn-text').textContent = 'Update Product';
+    updateProductTypeFields();
     document.getElementById('book-modal').style.display = 'flex';
   } catch (error) {
     console.error('Failed to load book for editing:', error);
   }
 };
+
+function updateProductTypeFields() {
+  const type = document.getElementById('form-book-producttype')?.value || 'book';
+  const authorLabel = document.querySelector('label[for="form-book-author"]');
+  const sizesInput = document.getElementById('form-book-sizes');
+  const formatSelect = document.getElementById('form-book-format');
+
+  const sizesGroup = sizesInput ? sizesInput.closest('.form-group') : null;
+  const formatGroup = formatSelect ? formatSelect.closest('.form-group') : null;
+
+  if (type === 'clothing') {
+    if (authorLabel) authorLabel.textContent = 'Brand / Designer / Label (Optional)';
+    if (sizesGroup) sizesGroup.style.display = 'block';
+    if (formatGroup) formatGroup.style.display = 'none';
+  } else {
+    if (authorLabel) authorLabel.textContent = 'Author *';
+    if (sizesGroup) sizesGroup.style.display = 'none';
+    if (formatGroup) formatGroup.style.display = 'block';
+  }
+}
 
 function clearBookForm() {
   editingBookId = null;
@@ -864,6 +912,7 @@ function clearBookForm() {
   document.getElementById('submit-btn-text').textContent = 'Add Product';
   document.getElementById('form-error').style.display = 'none';
   document.getElementById('form-success').style.display = 'none';
+  updateProductTypeFields();
 }
 
 /* ─── Delete Book ───────────────────────────────────────── */

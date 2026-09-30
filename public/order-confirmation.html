@@ -1,100 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Order Confirmation — Dar Al Ghuraba Books</title>
   <meta name="description" content="Thank you for your order with Dar Al Ghuraba Books. Your order details and tracking status.">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" type="image/jpeg" href="assets/images/logo.jpg">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cinzel:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/styles.css?v=5">
   <style>
-    :root {
-      --conf-gold: #c5a059;
-      --conf-emerald: #0f3d24;
-      --conf-bg: #0d1310;
-      --conf-card: #151e18;
-      --conf-border: #233328;
-      --conf-text: #e8ece9;
-      --conf-muted: #8b9d90;
-    }
-
-    body {
-      background-color: var(--conf-bg);
-      color: var(--conf-text);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    .conf-page-wrapper {
       min-height: 100vh;
-      margin: 0;
-      padding: 0;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background var(--transition-base), color var(--transition-base);
     }
 
-    .conf-header {
-      border-bottom: 1px solid var(--conf-border);
-      background: rgba(15, 61, 36, 0.4);
-      backdrop-filter: blur(12px);
-      padding: 18px 0;
+    .conf-navbar {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
     }
-    .conf-header-inner {
-      max-width: 900px;
+
+    .conf-nav-container {
+      max-width: var(--page-width);
       margin: 0 auto;
       padding: 0 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .conf-logo {
-      font-family: 'Cinzel', serif;
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: #fff;
+
+    .conf-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
       text-decoration: none;
-      letter-spacing: 0.04em;
+      color: var(--text-primary);
     }
-    .conf-logo span {
-      color: var(--conf-gold);
+
+    .conf-brand img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1.5px solid var(--accent-gold);
+    }
+
+    .conf-brand-title {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: 0.03em;
+    }
+
+    .conf-brand-title span {
+      color: var(--accent-gold);
     }
 
     .conf-container {
       max-width: 800px;
       margin: 40px auto 80px;
-      padding: 0 24px;
+      padding: 0 20px;
     }
 
     .conf-card {
-      background: var(--conf-card);
-      border: 1px solid var(--conf-border);
-      border-radius: 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--card-radius);
       padding: 36px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+      box-shadow: var(--shadow-md);
+    }
+
+    @media (max-width: 600px) {
+      .conf-card {
+        padding: 24px 18px;
+      }
     }
 
     .conf-hero {
       text-align: center;
-      padding-bottom: 30px;
-      border-bottom: 1px solid var(--conf-border);
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border-subtle);
     }
+
     .conf-icon-circle {
       width: 68px;
       height: 68px;
       border-radius: 50%;
-      background: rgba(197, 160, 89, 0.15);
-      border: 2px solid var(--conf-gold);
-      color: var(--conf-gold);
+      background: rgba(var(--accent-gold-rgb), 0.15);
+      border: 2px solid var(--accent-gold);
+      color: var(--accent-gold);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       font-size: 2rem;
     }
+
     .conf-title {
       font-family: 'Cinzel', serif;
-      font-size: 1.8rem;
-      color: #fff;
+      font-size: 1.75rem;
+      color: var(--text-primary);
       margin: 0 0 10px;
     }
+
     .conf-subtitle {
-      color: var(--conf-muted);
+      color: var(--text-secondary);
       font-size: 0.95rem;
       max-width: 500px;
       margin: 0 auto;
@@ -102,194 +121,257 @@
     }
 
     .order-id-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--conf-border);
-      padding: 8px 18px;
-      border-radius: 20px;
-      margin-top: 18px;
+      display: inline-block;
+      margin-top: 14px;
+      padding: 6px 14px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
       font-family: monospace;
-      font-size: 1rem;
-      color: var(--conf-gold);
-    }
-    .btn-copy {
-      background: none;
-      border: none;
-      color: var(--conf-muted);
-      cursor: pointer;
-      font-size: 0.8rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-    .btn-copy:hover {
-      color: #fff;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--accent-gold);
     }
 
-    .conf-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin: 30px 0;
+    .conf-section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 28px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    @media (max-width: 640px) {
-      .conf-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
-      .conf-card {
-        padding: 24px 18px;
-      }
-    }
-
-    .info-block {
-      background: #0d1410;
-      border: 1px solid var(--conf-border);
-      border-radius: 10px;
+    .order-status-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
       padding: 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
     }
-    .info-block-title {
-      font-size: 0.8rem;
+
+    .status-item .label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--conf-gold);
-      margin-bottom: 8px;
+      margin-bottom: 4px;
+    }
+
+    .status-item .value {
+      font-size: 0.95rem;
       font-weight: 600;
+      color: var(--text-primary);
     }
-    .info-block-content {
-      font-size: 0.9rem;
-      line-height: 1.5;
-      color: #fff;
-    }
-    .status-pill {
+
+    .status-badge {
       display: inline-block;
       padding: 3px 10px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-    .status-paid {
-      background: rgba(40, 167, 69, 0.2);
-      color: #4cd964;
-      border: 1px solid rgba(40, 167, 69, 0.4);
-    }
-    .status-pending {
-      background: rgba(255, 193, 7, 0.2);
-      color: #ffcc00;
-      border: 1px solid rgba(255, 193, 7, 0.4);
-    }
-
-    /* Items Table */
-    .conf-items {
-      margin: 30px 0;
-      border-top: 1px solid var(--conf-border);
-      padding-top: 24px;
-    }
-    .conf-items-title {
-      font-family: 'Cinzel', serif;
-      font-size: 1.1rem;
-      color: #fff;
-      margin-bottom: 16px;
-    }
-    .conf-item-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 0.95rem;
-    }
-    .conf-item-name {
-      color: #fff;
-      font-weight: 500;
-    }
-    .conf-item-qty {
-      color: var(--conf-muted);
-      font-size: 0.85rem;
-    }
-
-    .conf-totals {
-      border-top: 1px solid var(--conf-border);
-      padding-top: 16px;
-      margin-top: 16px;
-    }
-    .conf-totals-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-      color: var(--conf-muted);
-    }
-    .conf-totals-row.grand-total {
-      border-top: 1px dashed var(--conf-border);
-      padding-top: 12px;
-      margin-top: 12px;
-      font-size: 1.25rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
       font-weight: 700;
-      color: #fff;
     }
-    .conf-totals-row.grand-total span:last-child {
-      color: var(--conf-gold);
+
+    .status-badge.paid { background: rgba(46, 204, 113, 0.15); color: #2ECC71; border: 1px solid rgba(46, 204, 113, 0.3); }
+    .status-badge.pending { background: rgba(243, 156, 18, 0.15); color: #F39C12; border: 1px solid rgba(243, 156, 18, 0.3); }
+    .status-badge.failed { background: rgba(231, 76, 60, 0.15); color: #E74C3C; border: 1px solid rgba(231, 76, 60, 0.3); }
+
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .items-table th {
+      text-align: left;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      padding: 10px 8px;
+      border-bottom: 1.5px solid var(--border-subtle);
+    }
+
+    .items-table td {
+      padding: 12px 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .totals-box {
+      border-top: 1.5px dashed var(--border-subtle);
+      padding-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+    }
+
+    .totals-row.final {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-top: 6px;
+    }
+
+    .totals-row.final .amount {
+      color: var(--accent-gold);
     }
 
     .conf-actions {
       display: flex;
-      gap: 16px;
-      margin-top: 36px;
-      justify-content: center;
+      gap: 14px;
+      margin-top: 32px;
       flex-wrap: wrap;
     }
-    .conf-btn {
-      padding: 12px 26px;
-      border-radius: 8px;
+
+    .btn-action {
+      flex: 1;
+      min-width: 180px;
+      padding: 14px 20px;
+      border-radius: 10px;
       font-weight: 600;
       font-size: 0.95rem;
+      text-align: center;
       text-decoration: none;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
-      transition: all 0.2s ease;
+      transition: all var(--transition-fast);
     }
-    .conf-btn-primary {
-      background: var(--conf-gold);
-      color: #0d1310;
+
+    .btn-primary-action {
+      background: linear-gradient(135deg, var(--accent-gold), #A57D34);
+      color: #0C1410;
+      border: none;
     }
-    .conf-btn-primary:hover {
-      background: #d4af37;
+
+    .btn-primary-action:hover {
+      background: linear-gradient(135deg, var(--accent-gold-light), var(--accent-gold));
+      transform: translateY(-2px);
     }
-    .conf-btn-outline {
-      background: transparent;
-      border: 1px solid var(--conf-border);
-      color: #fff;
+
+    .btn-secondary-action {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
     }
-    .conf-btn-outline:hover {
-      border-color: var(--conf-gold);
-      color: var(--conf-gold);
+
+    .btn-secondary-action:hover {
+      border-color: var(--accent-emerald);
+      color: var(--accent-emerald);
     }
   </style>
 </head>
-<body>
+<body class="conf-page-wrapper">
 
-  <header class="conf-header">
-    <div class="conf-header-inner">
-      <a href="/" class="conf-logo">
-        <span>Dar Al Ghuraba</span> Books
+  <nav class="conf-navbar">
+    <div class="conf-nav-container">
+      <a href="/" class="conf-brand">
+        <img src="assets/images/logo.jpg" alt="Dar Al Ghuraba Logo">
+        <div class="conf-brand-title">
+          <span>Dar Al Ghuraba</span> Books
+        </div>
       </a>
-      <a href="/" style="color: var(--conf-muted); text-decoration: none; font-size: 0.9rem;">Back to Store</a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme" style="background:none; border:1px solid var(--border-subtle); border-radius:50%; width:38px; height:38px; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;">🌙</button>
     </div>
-  </header>
+  </nav>
 
   <main class="conf-container">
-    <div class="conf-card" id="conf-card">
-      <div style="text-align: center; padding: 40px 0;">
-        <p style="color: var(--conf-muted);">Loading order details...</p>
+    <div class="conf-card" id="conf-card-content">
+      
+      <div class="conf-hero">
+        <div class="conf-icon-circle">✓</div>
+        <h1 class="conf-title">JazakAllah Khair!</h1>
+        <p class="conf-subtitle">Your order has been received and is now being processed.</p>
+        <div class="order-id-badge" id="order-id-badge">Loading...</div>
       </div>
+
+      <h2 class="conf-section-title">Order Status</h2>
+      <div class="order-status-card">
+        <div class="status-item">
+          <div class="label">Payment Status</div>
+          <div class="value" id="status-payment"><span class="status-badge pending">Checking...</span></div>
+        </div>
+        <div class="status-item">
+          <div class="label">Order Status</div>
+          <div class="value" id="status-order">Pending</div>
+        </div>
+        <div class="status-item">
+          <div class="label">Payment Method</div>
+          <div class="value" id="status-method">—</div>
+        </div>
+      </div>
+
+      <h2 class="conf-section-title">Items Ordered</h2>
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th style="text-align: center;">Qty</th>
+            <th style="text-align: right;">Price</th>
+          </tr>
+        </thead>
+        <tbody id="conf-items-tbody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+
+      <div class="totals-box">
+        <div class="totals-row">
+          <span>Subtotal</span>
+          <span id="conf-subtotal">Rs. 0</span>
+        </div>
+        <div class="totals-row">
+          <span>Shipping Fee</span>
+          <span id="conf-shipping">Rs. 0</span>
+        </div>
+        <div class="totals-row final">
+          <span>Total Paid / Payable</span>
+          <span class="amount" id="conf-total">Rs. 0</span>
+        </div>
+      </div>
+
+      <div class="conf-actions">
+        <a href="catalog.html" class="btn-action btn-primary-action">Continue Browsing</a>
+        <a href="https://wa.me/923708998986" target="_blank" rel="noopener noreferrer" class="btn-action btn-secondary-action">
+          💬 Need Help? Contact WhatsApp
+        </a>
+      </div>
+
     </div>
   </main>
 
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('dar_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      const toggleBtn = document.getElementById('theme-toggle');
+      if (toggleBtn) {
+        toggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        toggleBtn.addEventListener('click', () => {
+          const current = document.documentElement.getAttribute('data-theme');
+          const next = current === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', next);
+          localStorage.setItem('dar_theme', next);
+          toggleBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+        });
+      }
+    })();
+  </script>
   <script src="js/order-confirmation.js"></script>
 </body>
 </html>

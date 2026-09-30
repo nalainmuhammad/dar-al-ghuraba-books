@@ -330,8 +330,9 @@ async function handlePlaceOrder(e) {
 
     // ── Safepay ──
     if (paymentMethod === 'safepay') {
-      if (payData.checkoutUrl) {
-        window.location.href = payData.checkoutUrl;
+      const redirect = payData.redirectUrl || payData.checkoutUrl;
+      if (redirect) {
+        window.location.href = redirect;
         return;
       }
       throw new Error('Safepay checkout URL was not generated.');
