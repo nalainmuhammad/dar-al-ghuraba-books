@@ -226,9 +226,9 @@ router.post(
             webhookSecret: process.env.SAFEPAY_WEBHOOK_SECRET,
           });
 
-          // Create payment tracker
+          // Create payment tracker (Safepay v2 expects amount in PKR)
           const { token } = await safepay.payments.create({
-            amount: Math.round(order.totalAmount * 100), // Amount in paisa
+            amount: order.totalAmount,
             currency: 'PKR',
           });
 
