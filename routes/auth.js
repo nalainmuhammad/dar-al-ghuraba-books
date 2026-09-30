@@ -9,7 +9,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
-const { protect } = require('../middleware/auth');
+const { protect, blacklistToken } = require('../middleware/auth');
 
 /* ─── Helper: Generate JWT Token ───────────────────────── */
 const generateToken = (userId) => {
@@ -80,6 +80,24 @@ router.post(
     }
   }
 );
+
+/* ─── POST /api/auth/logout — Revoke current JWT token ──── */
+router.post('/logout', protect, async (req, res) => {
+  try {
+    if (req.token) {
+      blacklistToken(req.token);
+    }
+    res.json({
+      success: true,
+      message: 'Logged out successfully. Token revoked.',
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to log out',
+    });
+  }
+});
 
 /* ─── GET /api/auth/me — Verify Token & Return Profile ──── */
 router.get('/me', protect, async (req, res) => {

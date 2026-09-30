@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmation — Dar Al Ghuraba Books</title>
+  <meta name="description" content="Thank you for your order with Dar Al Ghuraba Books. Your order details and tracking status.">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --conf-gold: #c5a059;
+      --conf-emerald: #0f3d24;
+      --conf-bg: #0d1310;
+      --conf-card: #151e18;
+      --conf-border: #233328;
+      --conf-text: #e8ece9;
+      --conf-muted: #8b9d90;
+    }
+
+    body {
+      background-color: var(--conf-bg);
+      color: var(--conf-text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    .conf-header {
+      border-bottom: 1px solid var(--conf-border);
+      background: rgba(15, 61, 36, 0.4);
+      backdrop-filter: blur(12px);
+      padding: 18px 0;
+    }
+    .conf-header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .conf-logo {
+      font-family: 'Cinzel', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+    }
+    .conf-logo span {
+      color: var(--conf-gold);
+    }
+
+    .conf-container {
+      max-width: 800px;
+      margin: 40px auto 80px;
+      padding: 0 24px;
+    }
+
+    .conf-card {
+      background: var(--conf-card);
+      border: 1px solid var(--conf-border);
+      border-radius: 16px;
+      padding: 36px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    .conf-hero {
+      text-align: center;
+      padding-bottom: 30px;
+      border-bottom: 1px solid var(--conf-border);
+    }
+    .conf-icon-circle {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: rgba(197, 160, 89, 0.15);
+      border: 2px solid var(--conf-gold);
+      color: var(--conf-gold);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      font-size: 2rem;
+    }
+    .conf-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      color: #fff;
+      margin: 0 0 10px;
+    }
+    .conf-subtitle {
+      color: var(--conf-muted);
+      font-size: 0.95rem;
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    .order-id-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--conf-border);
+      padding: 8px 18px;
+      border-radius: 20px;
+      margin-top: 18px;
+      font-family: monospace;
+      font-size: 1rem;
+      color: var(--conf-gold);
+    }
+    .btn-copy {
+      background: none;
+      border: none;
+      color: var(--conf-muted);
+      cursor: pointer;
+      font-size: 0.8rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .btn-copy:hover {
+      color: #fff;
+    }
+
+    .conf-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 30px 0;
+    }
+
+    @media (max-width: 640px) {
+      .conf-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .conf-card {
+        padding: 24px 18px;
+      }
+    }
+
+    .info-block {
+      background: #0d1410;
+      border: 1px solid var(--conf-border);
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .info-block-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--conf-gold);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .info-block-content {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #fff;
+    }
+    .status-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .status-paid {
+      background: rgba(40, 167, 69, 0.2);
+      color: #4cd964;
+      border: 1px solid rgba(40, 167, 69, 0.4);
+    }
+    .status-pending {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffcc00;
+      border: 1px solid rgba(255, 193, 7, 0.4);
+    }
+
+    /* Items Table */
+    .conf-items {
+      margin: 30px 0;
+      border-top: 1px solid var(--conf-border);
+      padding-top: 24px;
+    }
+    .conf-items-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .conf-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.95rem;
+    }
+    .conf-item-name {
+      color: #fff;
+      font-weight: 500;
+    }
+    .conf-item-qty {
+      color: var(--conf-muted);
+      font-size: 0.85rem;
+    }
+
+    .conf-totals {
+      border-top: 1px solid var(--conf-border);
+      padding-top: 16px;
+      margin-top: 16px;
+    }
+    .conf-totals-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      color: var(--conf-muted);
+    }
+    .conf-totals-row.grand-total {
+      border-top: 1px dashed var(--conf-border);
+      padding-top: 12px;
+      margin-top: 12px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .conf-totals-row.grand-total span:last-child {
+      color: var(--conf-gold);
+    }
+
+    .conf-actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 36px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .conf-btn {
+      padding: 12px 26px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .conf-btn-primary {
+      background: var(--conf-gold);
+      color: #0d1310;
+    }
+    .conf-btn-primary:hover {
+      background: #d4af37;
+    }
+    .conf-btn-outline {
+      background: transparent;
+      border: 1px solid var(--conf-border);
+      color: #fff;
+    }
+    .conf-btn-outline:hover {
+      border-color: var(--conf-gold);
+      color: var(--conf-gold);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="conf-header">
+    <div class="conf-header-inner">
+      <a href="/" class="conf-logo">
+        <span>Dar Al Ghuraba</span> Books
+      </a>
+      <a href="/" style="color: var(--conf-muted); text-decoration: none; font-size: 0.9rem;">Back to Store</a>
+    </div>
+  </header>
+
+  <main class="conf-container">
+    <div class="conf-card" id="conf-card">
+      <div style="text-align: center; padding: 40px 0;">
+        <p style="color: var(--conf-muted);">Loading order details...</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/order-confirmation.js"></script>
+</body>
+</html>

@@ -19,6 +19,7 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
+const cron = require('node-cron');
 
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
@@ -28,9 +29,14 @@ const bookRoutes = require('./routes/books');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const categoryRoutes = require('./routes/categories');
+const uploadRoutes = require('./routes/upload');
+const shippingRoutes = require('./routes/shipping');
+const currencyRoutes = require('./routes/currency');
+const checkoutRoutes = require('./routes/checkout');
 
-// Models
+// Services & Models
 const Book = require('./models/Book');
+const { getExchangeRate } = require('./services/exchangeRate');
 
 const app = express();
 app.set('trust proxy', 1); // Trust first proxy (Render load balancer)
@@ -44,9 +50,15 @@ app.use(
         defaultSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
         fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-        imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-        connectSrc: ["'self'", 'https://wa.me'],
+        imgSrc: ["'self'", 'data:', 'https:', 'blob:', 'https://res.cloudinary.com'],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'https://*.getsafepay.com'],
+        frameSrc: ["'self'", 'https://*.getsafepay.com'],
+        connectSrc: [
+          "'self'",
+          'https://wa.me',
+          'https://api.frankfurter.app',
+          'https://*.getsafepay.com',
+        ],
       },
     },
     crossOriginEmbedderPolicy: false,
@@ -162,7 +174,15 @@ const loginLimiter = rateLimit({
 });
 
 /* ─── 6. Body Parsing ───────────────────────────────────── */
-app.use(express.json({ limit: '50mb' })); // allow larger payloads for base64 images
+app.use(
+  express.json({
+    limit: '50mb',
+    verify: (req, res, buf) => {
+      // Retain raw body buffer for payment webhook cryptographic signature verification
+      req.rawBody = buf.toString('utf8');
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 /* ─── 7. API Routes ─────────────────────────────────────── */
@@ -172,6 +192,10 @@ app.use('/api/auth/login', loginLimiter);
 app.use('/api/auth', publicApiLimiter, authRoutes);
 app.use('/api/admin', adminLimiter, adminRoutes);
 app.use('/api/categories', publicApiLimiter, categoryRoutes);
+app.use('/api/upload', adminLimiter, uploadRoutes);
+app.use('/api/shipping', publicApiLimiter, shippingRoutes);
+app.use('/api/currency', publicApiLimiter, currencyRoutes);
+app.use('/api/checkout', checkoutRoutes); // handles its own validation & webhook signature checks
 
 // Config endpoint (serves WhatsApp number to frontend)
 app.get('/api/config', (req, res) => {
@@ -318,8 +342,29 @@ app.use(errorHandler);
 /* ─── 12. Start Server ──────────────────────────────────── */
 const startServer = async () => {
   try {
+    // ─── Startup Security Check ───
+    if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+      console.warn('⚠️  SECURITY WARNING: JWT_SECRET is missing or shorter than 32 characters! Please use a strong 64+ char key in production.');
+    }
+
     // Connect to MongoDB
     await connectDB();
+
+    // ─── Initialize Exchange Rate Cache ───
+    getExchangeRate()
+      .then((rateData) => {
+        console.log(`💱 Exchange rate ready: 1 USD = ${rateData.rate} PKR`);
+      })
+      .catch((err) => {
+        console.warn('⚠️  Exchange rate initial fetch deferred:', err.message);
+      });
+
+    // Schedule daily check at 03:00 to refresh exchange rate cache
+    cron.schedule('0 3 * * *', () => {
+      getExchangeRate().catch((err) =>
+        console.error('Scheduled exchange rate refresh failed:', err.message)
+      );
+    });
 
     app.listen(PORT, () => {
       console.log(`\n🕌  Dar Al Ghuraba Books Server`);
@@ -328,6 +373,7 @@ const startServer = async () => {
       console.log(`   📦  Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`   📚  API:         http://localhost:${PORT}/api/books`);
       console.log(`   🔐  Admin:       http://localhost:${PORT}/admin.html`);
+      console.log(`   💳  Checkout:    http://localhost:${PORT}/checkout.html`);
       console.log(`   ❤️   Health:      http://localhost:${PORT}/api/health\n`);
     });
   } catch (error) {

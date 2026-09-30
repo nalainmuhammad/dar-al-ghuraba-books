@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Checkout — Dar Al Ghuraba Books</title>
+  <meta name="description" content="Complete your purchase securely at Dar Al Ghuraba Books. We accept Visa, Mastercard, Safepay, JazzCash, Easypaisa, and Cash on Delivery.">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --checkout-gold: #c5a059;
+      --checkout-emerald: #0f3d24;
+      --checkout-bg: #0d1310;
+      --checkout-card: #151e18;
+      --checkout-border: #233328;
+      --checkout-text: #e8ece9;
+      --checkout-muted: #8b9d90;
+    }
+
+    body {
+      background-color: var(--checkout-bg);
+      color: var(--checkout-text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Checkout Header */
+    .checkout-header {
+      border-bottom: 1px solid var(--checkout-border);
+      background: rgba(15, 61, 36, 0.4);
+      backdrop-filter: blur(12px);
+      padding: 18px 0;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .checkout-header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .checkout-logo {
+      font-family: 'Cinzel', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.04em;
+    }
+    .checkout-logo span {
+      color: var(--checkout-gold);
+    }
+    .security-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--checkout-muted);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--checkout-border);
+    }
+    .security-badge svg {
+      color: var(--checkout-gold);
+    }
+
+    /* Main Container */
+    .checkout-container {
+      max-width: 1200px;
+      margin: 40px auto 80px;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    @media (max-width: 960px) {
+      .checkout-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+    }
+
+    /* Card Panels */
+    .checkout-panel {
+      background: var(--checkout-card);
+      border: 1px solid var(--checkout-border);
+      border-radius: 14px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    }
+    .panel-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #fff;
+      margin-top: 0;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--checkout-border);
+    }
+    .step-number {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--checkout-gold), #9a7632);
+      color: #0d1310;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Form Fields */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--checkout-muted);
+      margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%;
+      box-sizing: border-box;
+      background: #0d1410;
+      border: 1px solid var(--checkout-border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      color: #fff;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--checkout-gold);
+      box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.15);
+    }
+    select.form-control {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c5a059' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+
+    /* Payment Methods Grid */
+    .payment-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .payment-option {
+      border: 1.5px solid var(--checkout-border);
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #0d1410;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .payment-option:hover {
+      border-color: #3d5644;
+    }
+    .payment-option.selected {
+      border-color: var(--checkout-gold);
+      background: rgba(197, 160, 89, 0.06);
+    }
+    .payment-radio-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .payment-radio-wrap input[type="radio"] {
+      accent-color: var(--checkout-gold);
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    .payment-name {
+      font-weight: 600;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+    .payment-subtitle {
+      font-size: 0.8rem;
+      color: var(--checkout-muted);
+      margin-top: 2px;
+    }
+    .payment-badges {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .badge-tag {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .badge-visa { color: #5bc0de; }
+    .badge-master { color: #f0ad4e; }
+    .badge-jazz { color: #d9534f; }
+    .badge-easy { color: #5cb85c; }
+    .badge-cod { color: var(--checkout-gold); }
+
+    /* Order Summary Sticky Sidebar */
+    .order-summary {
+      position: sticky;
+      top: 100px;
+    }
+    .cart-summary-items {
+      max-height: 280px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      padding-right: 6px;
+    }
+    .summary-item {
+      display: flex;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      align-items: center;
+    }
+    .summary-item-thumb {
+      width: 48px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 6px;
+      background: #111;
+      border: 1px solid var(--checkout-border);
+      flex-shrink: 0;
+    }
+    .summary-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .summary-item-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .summary-item-meta {
+      font-size: 0.8rem;
+      color: var(--checkout-muted);
+      margin-top: 2px;
+    }
+    .summary-item-price {
+      font-weight: 600;
+      color: #fff;
+      font-size: 0.9rem;
+      text-align: right;
+    }
+
+    /* Price Breakdown */
+    .price-breakdown {
+      border-top: 1px solid var(--checkout-border);
+      padding-top: 16px;
+      margin-bottom: 20px;
+    }
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+      color: var(--checkout-muted);
+    }
+    .price-row.total-row {
+      border-top: 1px dashed var(--checkout-border);
+      padding-top: 14px;
+      margin-top: 14px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .price-row.total-row .total-amount {
+      color: var(--checkout-gold);
+    }
+    .shipping-calc-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      color: var(--checkout-gold);
+      background: rgba(197, 160, 89, 0.12);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 6px;
+    }
+
+    /* Submit Button */
+    .btn-place-order {
+      width: 100%;
+      background: linear-gradient(135deg, var(--checkout-gold), #a57d34);
+      color: #0d1310;
+      font-weight: 700;
+      font-size: 1.05rem;
+      padding: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+      letter-spacing: 0.02em;
+    }
+    .btn-place-order:hover {
+      background: linear-gradient(135deg, #d4af37, #b88d3e);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(197, 160, 89, 0.3);
+    }
+    .btn-place-order:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .checkout-alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .checkout-alert.error {
+      display: block;
+      background: rgba(220, 53, 69, 0.15);
+      border: 1px solid rgba(220, 53, 69, 0.4);
+      color: #ff8585;
+    }
+    .checkout-alert.info {
+      display: block;
+      background: rgba(197, 160, 89, 0.12);
+      border: 1px solid rgba(197, 160, 89, 0.3);
+      color: var(--checkout-gold);
+    }
+
+    .empty-cart-state {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .empty-cart-state a {
+      color: var(--checkout-gold);
+      text-decoration: underline;
+      margin-top: 10px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Checkout Header -->
+  <header class="checkout-header">
+    <div class="checkout-header-inner">
+      <a href="/" class="checkout-logo">
+        <span>Dar Al Ghuraba</span> Books
+      </a>
+      <div class="security-badge">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>256-Bit SSL Encrypted Checkout</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Checkout Main Form -->
+  <main class="checkout-container">
+    
+    <!-- Left Column: Shipping & Payment -->
+    <div class="checkout-main">
+      <div id="checkout-alert" class="checkout-alert"></div>
+
+      <!-- Step 1: Customer & Delivery Details -->
+      <section class="checkout-panel">
+        <h2 class="panel-title">
+          <span class="step-number">1</span> Delivery & Shipping Details
+        </h2>
+
+        <form id="checkout-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cust-name">Full Name *</label>
+              <input type="text" id="cust-name" class="form-control" placeholder="Muhammad Ali" required>
+            </div>
+            <div class="form-group">
+              <label for="cust-email">Email Address * (for confirmation & receipt)</label>
+              <input type="email" id="cust-email" class="form-control" placeholder="ali@example.com" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cust-phone">WhatsApp / Phone Number *</label>
+              <input type="tel" id="cust-phone" class="form-control" placeholder="0300 1234567" required>
+            </div>
+            <div class="form-group">
+              <label for="cust-country">Destination Country *</label>
+              <select id="cust-country" class="form-control" required>
+                <option value="PK" data-code="PK" selected>🇵🇰 Pakistan (Domestic)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cust-address">Street Address, House/Apt No. *</label>
+            <input type="text" id="cust-address" class="form-control" placeholder="House 12, Street 4, Sector G-9/1" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cust-city">City *</label>
+              <input type="text" id="cust-city" class="form-control" placeholder="Islamabad" required>
+            </div>
+            <div class="form-group">
+              <label for="cust-postal">Postal / Zip Code (optional)</label>
+              <input type="text" id="cust-postal" class="form-control" placeholder="44000">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cust-notes">Delivery Instructions / Notes (optional)</label>
+            <input type="text" id="cust-notes" class="form-control" placeholder="e.g. Call before delivery, leave with guard">
+          </div>
+        </form>
+      </section>
+
+      <!-- Step 2: Payment Method Selection -->
+      <section class="checkout-panel">
+        <h2 class="panel-title">
+          <span class="step-number">2</span> Payment Method
+        </h2>
+
+        <div class="payment-options">
+
+          <!-- Safepay (Visa / Mastercard) -->
+          <label class="payment-option selected" for="pay-safepay">
+            <div class="payment-radio-wrap">
+              <input type="radio" id="pay-safepay" name="paymentMethod" value="safepay" checked>
+              <div>
+                <div class="payment-name">Visa / Mastercard / Debit Card</div>
+                <div class="payment-subtitle">Powered by Safepay — Secure local & international card gateway</div>
+              </div>
+            </div>
+            <div class="payment-badges">
+              <span class="badge-tag badge-visa">VISA</span>
+              <span class="badge-tag badge-master">Mastercard</span>
+              <span class="badge-tag">PayPak</span>
+            </div>
+          </label>
+
+          <!-- JazzCash -->
+          <label class="payment-option" for="pay-jazzcash">
+            <div class="payment-radio-wrap">
+              <input type="radio" id="pay-jazzcash" name="paymentMethod" value="jazzcash">
+              <div>
+                <div class="payment-name">JazzCash</div>
+                <div class="payment-subtitle">Pay via JazzCash Mobile Account or Voucher</div>
+              </div>
+            </div>
+            <div class="payment-badges">
+              <span class="badge-tag badge-jazz">JazzCash</span>
+            </div>
+          </label>
+
+          <!-- Easypaisa -->
+          <label class="payment-option" for="pay-easypaisa">
+            <div class="payment-radio-wrap">
+              <input type="radio" id="pay-easypaisa" name="paymentMethod" value="easypaisa">
+              <div>
+                <div class="payment-name">Easypaisa</div>
+                <div class="payment-subtitle">Pay via Easypaisa Mobile Account or QR</div>
+              </div>
+            </div>
+            <div class="payment-badges">
+              <span class="badge-tag badge-easy">Easypaisa</span>
+            </div>
+          </label>
+
+          <!-- Cash on Delivery (Pakistan only) -->
+          <label class="payment-option" id="cod-option-wrap" for="pay-cod">
+            <div class="payment-radio-wrap">
+              <input type="radio" id="pay-cod" name="paymentMethod" value="cod">
+              <div>
+                <div class="payment-name">Cash on Delivery (Pakistan Only)</div>
+                <div class="payment-subtitle">Pay cash when your parcel arrives at your doorstep</div>
+              </div>
+            </div>
+            <div class="payment-badges">
+              <span class="badge-tag badge-cod">COD</span>
+            </div>
+          </label>
+
+          <!-- WhatsApp Manual Order -->
+          <label class="payment-option" for="pay-whatsapp">
+            <div class="payment-radio-wrap">
+              <input type="radio" id="pay-whatsapp" name="paymentMethod" value="whatsapp">
+              <div>
+                <div class="payment-name">Confirm & Pay via WhatsApp</div>
+                <div class="payment-subtitle">Direct order confirmation with our representative on WhatsApp</div>
+              </div>
+            </div>
+            <div class="payment-badges">
+              <span class="badge-tag" style="color: #25D366;">WhatsApp</span>
+            </div>
+          </label>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Right Column: Order Summary -->
+    <aside class="checkout-sidebar">
+      <div class="checkout-panel order-summary">
+        <h2 class="panel-title">
+          Order Summary <span id="cart-item-count" style="font-size: 0.9rem; color: var(--checkout-muted); font-weight: 400;">(0 items)</span>
+        </h2>
+
+        <!-- Items list -->
+        <div id="summary-items-list" class="cart-summary-items">
+          <!-- Populated by checkout.js -->
+        </div>
+
+        <!-- Total Weight Note -->
+        <div style="font-size: 0.8rem; color: var(--checkout-muted); margin-bottom: 12px; display: flex; justify-content: space-between;">
+          <span>Estimated Total Weight:</span>
+          <span id="total-weight-display" style="font-weight: 600; color: #fff;">0.5 kg</span>
+        </div>
+
+        <!-- Price breakdown -->
+        <div class="price-breakdown">
+          <div class="price-row">
+            <span>Subtotal</span>
+            <span id="summary-subtotal">Rs. 0</span>
+          </div>
+          <div class="price-row">
+            <span>
+              Shipping
+              <span id="shipping-method-tag" class="shipping-calc-badge">Domestic</span>
+            </span>
+            <span id="summary-shipping">Rs. 225</span>
+          </div>
+          <div class="price-row total-row">
+            <span>Total to Pay</span>
+            <span class="total-amount" id="summary-total">Rs. 225</span>
+          </div>
+        </div>
+
+        <button type="button" id="btn-place-order" class="btn-place-order">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
+          </svg>
+          <span id="place-order-text">Place Order & Pay</span>
+        </button>
+
+        <p style="font-size: 0.75rem; color: var(--checkout-muted); text-align: center; margin-top: 14px; line-height: 1.4;">
+          By placing your order, you agree to Dar Al Ghuraba Books delivery & return policies. All transactions are securely encrypted.
+        </p>
+      </div>
+    </aside>
+
+  </main>
+
+  <script src="js/checkout.js"></script>
+</body>
+</html>

@@ -29,9 +29,56 @@ const validate = (req, res, next) => {
 /* ─── GET /api/categories — List All ────────────────────── */
 router.get('/', async (req, res, next) => {
   try {
-    const categories = await Category.find().sort({ name: 1 }).lean();
+    const filter = {};
+    if (req.query.productType) {
+      filter.productType = req.query.productType;
+    }
+    const categories = await Category.find(filter)
+      .populate('parentCategory', 'name slug')
+      .sort({ order: 1, name: 1 })
+      .lean();
     res.set('Cache-Control', 'public, max-age=600, stale-while-revalidate=1200');
     res.json({ success: true, data: categories });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/* ─── GET /api/categories/tree — Hierarchical Tree ──────── */
+router.get('/tree', async (req, res, next) => {
+  try {
+    const filter = {};
+    if (req.query.productType) {
+      filter.productType = req.query.productType;
+    }
+
+    const allCategories = await Category.find(filter).sort({ order: 1, name: 1 }).lean();
+
+    // Separate parents and children
+    const rootCategories = [];
+    const childrenMap = new Map();
+
+    for (const cat of allCategories) {
+      if (!cat.parentCategory) {
+        rootCategories.push({ ...cat, subcategories: [] });
+      } else {
+        const pId = String(cat.parentCategory);
+        if (!childrenMap.has(pId)) {
+          childrenMap.set(pId, []);
+        }
+        childrenMap.get(pId).push(cat);
+      }
+    }
+
+    for (const root of rootCategories) {
+      const rootId = String(root._id);
+      if (childrenMap.has(rootId)) {
+        root.subcategories = childrenMap.get(rootId);
+      }
+    }
+
+    res.set('Cache-Control', 'public, max-age=600, stale-while-revalidate=1200');
+    res.json({ success: true, data: rootCategories });
   } catch (error) {
     next(error);
   }
@@ -44,7 +91,9 @@ router.get(
   validate,
   async (req, res, next) => {
     try {
-      const category = await Category.findById(req.params.id).lean();
+      const category = await Category.findById(req.params.id)
+        .populate('parentCategory', 'name slug')
+        .lean();
       if (!category) {
         return res.status(404).json({ success: false, message: 'Category not found' });
       }
@@ -64,6 +113,10 @@ router.post(
   [
     body('name').trim().notEmpty().withMessage('Name is required'),
     body('description').optional().trim(),
+    body('parentCategory').optional({ nullable: true }).isMongoId().withMessage('Invalid parent category ID'),
+    body('productType').optional().isIn(['book', 'clothing', 'general']).withMessage('Invalid product type'),
+    body('order').optional().isInt().toInt(),
+    body('icon').optional().trim(),
   ],
   validate,
   async (req, res, next) => {
@@ -74,7 +127,12 @@ router.post(
         return res.status(400).json({ success: false, message: 'Category already exists' });
       }
 
-      const category = await Category.create(req.body);
+      const payload = { ...req.body };
+      if (payload.parentCategory === '' || payload.parentCategory === undefined) {
+        payload.parentCategory = null;
+      }
+
+      const category = await Category.create(payload);
       res.set('Cache-Control', 'no-store');
       res.status(201).json({ success: true, message: 'Category created', data: category });
     } catch (error) {
@@ -92,6 +150,10 @@ router.put(
   [
     body('name').optional().trim().notEmpty().withMessage('Name cannot be empty'),
     body('description').optional().trim(),
+    body('parentCategory').optional({ nullable: true }),
+    body('productType').optional().isIn(['book', 'clothing', 'general']),
+    body('order').optional().isInt().toInt(),
+    body('icon').optional().trim(),
   ],
   validate,
   async (req, res, next) => {
@@ -106,6 +168,12 @@ router.put(
       // Update fields
       if (req.body.name) category.name = req.body.name;
       if (req.body.description !== undefined) category.description = req.body.description;
+      if (req.body.parentCategory !== undefined) {
+        category.parentCategory = req.body.parentCategory ? req.body.parentCategory : null;
+      }
+      if (req.body.productType !== undefined) category.productType = req.body.productType;
+      if (req.body.order !== undefined) category.order = req.body.order;
+      if (req.body.icon !== undefined) category.icon = req.body.icon;
 
       await category.save();
 
@@ -141,12 +209,15 @@ router.delete(
 
       const catName = category.name;
 
-      // User requested: "delete all the books under those categories"
-      await Book.deleteMany({ category: catName });
-      await category.deleteOne();
+      // Also find child categories and delete them and their books
+      const childCategories = await Category.find({ parentCategory: category._id });
+      const allCategoryNames = [catName, ...childCategories.map((c) => c.name)];
+
+      await Book.deleteMany({ category: { $in: allCategoryNames } });
+      await Category.deleteMany({ _id: { $in: [category._id, ...childCategories.map((c) => c._id)] } });
 
       res.set('Cache-Control', 'no-store');
-      res.json({ success: true, message: 'Category and all associated books deleted' });
+      res.json({ success: true, message: 'Category, subcategories, and associated books deleted' });
     } catch (error) {
       next(error);
     }

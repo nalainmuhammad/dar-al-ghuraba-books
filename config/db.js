@@ -5,7 +5,11 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
+    const uri = process.env.MONGO_URI || process.env.MONGODB_URI;
+    if (!uri) {
+      throw new Error('Neither MONGO_URI nor MONGODB_URI environment variable is defined.');
+    }
+    const conn = await mongoose.connect(uri, {
       // Mongoose 8 defaults to the new URL parser and unified topology
       maxPoolSize: 20, // increased connection pool for concurrent traffic
       minPoolSize: 2,  // maintain warm connections to avoid cold starts

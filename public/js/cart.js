@@ -73,8 +73,11 @@ function injectCartUI() {
           <span>Total:</span>
           <span class="cart-total-price">Rs. <span id="cart-total-amount">0</span></span>
         </div>
-        <button class="btn btn-primary" id="cart-checkout-btn" style="width: 100%;">
-          Order via WhatsApp
+        <a href="/checkout.html" class="btn btn-primary" id="cart-online-checkout-btn" style="width: 100%; text-align: center; text-decoration: none; margin-bottom: 8px; display: block; font-weight: 600;">
+          💳 Proceed to Online Checkout
+        </a>
+        <button class="btn btn-outline" id="cart-checkout-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span>💬 Order via WhatsApp</span>
         </button>
       </div>
     </div>
@@ -99,6 +102,7 @@ window.addToCart = function (book) {
       price: book.price,
       imageUrl: book.imageUrl,
       slug: book.slug,
+      weight: book.weight || 500,
       quantity: 1
     });
   }

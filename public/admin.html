@@ -67,6 +67,9 @@
         <button class="sidebar-link" data-section="categories" id="nav-categories">
           <span class="sidebar-icon">📁</span> Categories
         </button>
+        <button class="sidebar-link" data-section="orders" id="nav-orders">
+          <span class="sidebar-icon">📦</span> Orders
+        </button>
       </nav>
 
       <div class="sidebar-footer">
@@ -136,6 +139,27 @@
             <div class="stat-info">
               <h3 id="stat-ondemand">—</h3>
               <p>On Demand</p>
+            </div>
+          </div>
+          <div class="stat-card glass-card-static">
+            <span class="stat-icon">📦</span>
+            <div class="stat-info">
+              <h3 id="stat-total-orders">—</h3>
+              <p>Total Orders</p>
+            </div>
+          </div>
+          <div class="stat-card glass-card-static">
+            <span class="stat-icon">⏳</span>
+            <div class="stat-info">
+              <h3 id="stat-pending-orders">—</h3>
+              <p>Pending Orders</p>
+            </div>
+          </div>
+          <div class="stat-card glass-card-static">
+            <span class="stat-icon">💰</span>
+            <div class="stat-info">
+              <h3 id="stat-revenue">—</h3>
+              <p>Total Revenue</p>
             </div>
           </div>
         </div>
@@ -209,6 +233,51 @@
         </div>
       </section>
 
+      <!-- ─── Orders Section ────────────────────────────────── -->
+      <section class="admin-section" id="section-orders" style="display:none;">
+        <div class="admin-section-header">
+          <h2>Manage Orders</h2>
+          <div class="section-actions">
+            <input type="text" class="admin-search" id="orders-search" placeholder="Search orders (ID, name, email)..." aria-label="Search orders">
+            <select class="admin-filter" id="orders-status-filter" aria-label="Filter by status">
+              <option value="">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <select class="admin-filter" id="orders-payment-filter" aria-label="Filter by payment">
+              <option value="">All Payments</option>
+              <option value="pending">Payment Pending</option>
+              <option value="paid">Paid</option>
+              <option value="failed">Failed</option>
+              <option value="refunded">Refunded</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="books-table-wrapper">
+          <table class="books-table" id="orders-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total (Rs.)</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody"></tbody>
+          </table>
+        </div>
+        <div class="admin-pagination" id="orders-pagination"></div>
+      </section>
+
     </main>
   </div>
 
@@ -240,13 +309,28 @@
             <input type="number" id="form-book-price" required min="0" step="1" placeholder="1500">
           </div>
           <div class="form-group" style="flex: 1;">
+            <label for="form-book-weight">Weight (grams)</label>
+            <input type="number" id="form-book-weight" min="0" step="1" placeholder="500" value="500">
+          </div>
+          <div class="form-group" style="flex: 1;">
             <label for="form-book-sortorder">Sort Order</label>
             <input type="number" id="form-book-sortorder" min="0" step="1" placeholder="0">
           </div>
+        </div>
+
+        <div class="form-row">
           <div class="form-group" style="flex: 2;">
             <label for="form-book-category">Category *</label>
             <select id="form-book-category" required>
               <option value="">Select Category</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label for="form-book-producttype">Product Type</label>
+            <select id="form-book-producttype">
+              <option value="book">Book</option>
+              <option value="clothing">Islamic Clothing</option>
+              <option value="other">Other</option>
             </select>
           </div>
           <div class="form-group" style="flex: 1;">
@@ -260,6 +344,11 @@
               <option value="Softcover">Softcover</option>
             </select>
           </div>
+        </div>
+
+        <div class="form-group">
+          <label for="form-book-sizes">Sizes (comma-separated, for clothing only)</label>
+          <input type="text" id="form-book-sizes" placeholder="e.g. S, M, L, XL, XXL">
         </div>
 
         <div class="form-group">
@@ -359,6 +448,130 @@
         <button class="btn btn-outline" id="btn-cancel-delete-category">Cancel</button>
         <button class="btn" id="btn-confirm-delete-category" style="background: #E74C3C; color: #fff;">Delete All</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ─── Order Details & Management Modal ─────────────────── -->
+  <div class="modal-overlay" id="order-modal" style="display:none; align-items: flex-start; overflow-y: auto; padding: 40px 20px;">
+    <div class="modal glass-card-static" style="max-width: 850px; width: 100%; text-align: left; margin: auto;">
+      <div class="admin-section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 15px;">
+        <div>
+          <h2 id="order-modal-id" style="margin: 0; font-size: 1.4rem;">Order Details</h2>
+          <span id="order-modal-date" style="font-size: 0.85rem; color: var(--text-secondary);"></span>
+        </div>
+        <button class="btn btn-outline btn-sm" id="btn-close-order-modal" style="padding: 4px 12px;">✕ Close</button>
+      </div>
+
+      <div class="order-details-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px;">
+        <!-- Customer Info -->
+        <div class="order-detail-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 16px;">
+          <h4 style="margin: 0 0 12px; color: var(--gold); display: flex; align-items: center; gap: 6px;">👤 Customer Info</h4>
+          <p style="margin: 4px 0; font-size: 0.9rem;"><strong>Name:</strong> <span id="order-cust-name">—</span></p>
+          <p style="margin: 4px 0; font-size: 0.9rem;"><strong>Email:</strong> <span id="order-cust-email">—</span></p>
+          <p style="margin: 4px 0; font-size: 0.9rem;"><strong>Phone:</strong> <span id="order-cust-phone">—</span></p>
+        </div>
+
+        <!-- Shipping Info -->
+        <div class="order-detail-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 16px;">
+          <h4 style="margin: 0 0 12px; color: var(--gold); display: flex; align-items: center; gap: 6px;">📍 Shipping Address</h4>
+          <p style="margin: 4px 0; font-size: 0.9rem;"><span id="order-ship-address">—</span></p>
+          <p style="margin: 4px 0; font-size: 0.9rem;"><span id="order-ship-city-country">—</span></p>
+          <p style="margin: 4px 0; font-size: 0.9rem;"><strong>Total Weight:</strong> <span id="order-ship-weight">—</span></p>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <h4 style="margin: 0 0 10px; color: var(--text-primary);">Ordered Items</h4>
+      <div class="books-table-wrapper" style="margin-bottom: 20px; max-height: 250px; overflow-y: auto;">
+        <table class="books-table" id="order-items-table" style="margin: 0;">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Details</th>
+              <th>Price</th>
+              <th>Qty</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="order-items-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Financial Breakdown -->
+      <div class="order-financials" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 14px; margin-bottom: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 15px; font-size: 0.9rem;">
+        <div>
+          <span style="color: var(--text-secondary);">Payment Method:</span>
+          <strong id="order-pay-method" style="margin-left: 6px;">—</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-secondary);">Subtotal:</span>
+          <strong id="order-subtotal" style="margin-left: 6px;">—</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-secondary);">Shipping:</span>
+          <strong id="order-shipping-fee" style="margin-left: 6px;">—</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-secondary);">Grand Total:</span>
+          <strong id="order-grand-total" style="margin-left: 6px; color: var(--gold); font-size: 1.05rem;">—</strong>
+        </div>
+      </div>
+
+      <!-- Update Status Form -->
+      <form id="order-update-form" style="border-top: 1px solid var(--border-subtle); padding-top: 20px;">
+        <input type="hidden" id="order-update-id" value="">
+        <h4 style="margin: 0 0 16px; color: var(--gold);">Update Order & Shipping Status</h4>
+        
+        <div class="form-row">
+          <div class="form-group" style="flex: 1;">
+            <label for="order-update-status">Order Status</label>
+            <select id="order-update-status">
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label for="order-update-payment-status">Payment Status</label>
+            <select id="order-update-payment-status">
+              <option value="pending">Pending</option>
+              <option value="paid">Paid</option>
+              <option value="failed">Failed</option>
+              <option value="refunded">Refunded</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex: 1;">
+            <label for="order-update-carrier">Carrier</label>
+            <input type="text" id="order-update-carrier" placeholder="e.g. Pakistan Post Air Parcel / Leopards">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label for="order-update-tracking">Tracking Number</label>
+            <input type="text" id="order-update-tracking" placeholder="e.g. PK123456789">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label for="order-update-notes">Admin / Internal Notes</label>
+          <textarea id="order-update-notes" rows="2" placeholder="Optional notes about this order..."></textarea>
+        </div>
+
+        <div class="form-actions" style="display: flex; gap: 12px; justify-content: flex-end;">
+          <button type="button" class="btn btn-outline" id="btn-cancel-order-modal">Close</button>
+          <button type="submit" class="btn btn-gold" id="btn-save-order-status">
+            <span id="order-save-text">Save Changes</span>
+            <span id="order-save-spinner" class="btn-spinner" style="display:none;"></span>
+          </button>
+        </div>
+
+        <div id="order-update-error" class="form-error" style="display:none; margin-top: 12px;"></div>
+        <div id="order-update-success" class="form-success" style="display:none; margin-top: 12px;"></div>
+      </form>
     </div>
   </div>
 

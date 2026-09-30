@@ -74,6 +74,21 @@ const bookSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    weight: {
+      type: Number,
+      default: 500,
+      min: [0, 'Weight cannot be negative'],
+    },
+    productType: {
+      type: String,
+      enum: ['book', 'clothing', 'other'],
+      default: 'book',
+      index: true,
+    },
+    sizes: {
+      type: [String],
+      default: [],
+    },
   },
   {
     timestamps: true, // adds createdAt and updatedAt

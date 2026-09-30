@@ -48,6 +48,9 @@ const bookValidators = [
   body('inStock').optional().isBoolean(),
   body('onDemand').optional().isBoolean(),
   body('sortOrder').optional().isInt().toInt(),
+  body('weight').optional().isFloat({ min: 0 }).withMessage('Weight must be positive (in grams)'),
+  body('productType').optional().isIn(['book', 'clothing', 'other']).withMessage('Invalid product type'),
+  body('sizes').optional(),
 ];
 
 /* ─── GET /api/books — List, Search, Filter, Sort, Paginate ─ */
@@ -61,6 +64,7 @@ router.get('/', async (req, res, next) => {
       sort,
       featured,
       inStock,
+      productType,
       page = 1,
       limit = 50,
     } = req.query;
@@ -74,6 +78,7 @@ router.get('/', async (req, res, next) => {
     if (featured === 'true') filter.featured = true;
     if (inStock !== undefined) filter.inStock = inStock === 'true';
     if (req.query.onDemand !== undefined) filter.onDemand = req.query.onDemand === 'true';
+    if (productType) filter.productType = productType;
 
     // Text search across title, author, description
     if (search) {
@@ -339,6 +344,9 @@ const updateBookHandler = async (req, res, next) => {
       'inStock',
       'onDemand',
       'sortOrder',
+      'weight',
+      'productType',
+      'sizes',
     ];
 
     const cleanUpdates = {};
@@ -355,6 +363,14 @@ const updateBookHandler = async (req, res, next) => {
           }
         } else if (field === 'price') {
           cleanUpdates.price = Number(req.body.price);
+        } else if (field === 'weight') {
+          cleanUpdates.weight = Number(req.body.weight);
+        } else if (field === 'sizes') {
+          if (Array.isArray(req.body.sizes)) {
+            cleanUpdates.sizes = req.body.sizes.map((s) => String(s).trim()).filter(Boolean);
+          } else if (typeof req.body.sizes === 'string') {
+            cleanUpdates.sizes = req.body.sizes.split(',').map((s) => s.trim()).filter(Boolean);
+          }
         } else if (field === 'sortOrder') {
           cleanUpdates.sortOrder = parseInt(req.body.sortOrder, 10);
         } else if (field === 'featured') {
